@@ -136,9 +136,10 @@ shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="movimentaPersonagem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Personagem.png" />
+    <Image Include="TexturaPersonagem\Personagem1.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
