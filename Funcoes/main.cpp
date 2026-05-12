@@ -31,10 +31,6 @@ int main(void)
 
 	Vector2 movimentaPersoangem(Vector2 personagemPosicao);
 
-	
-
-	
-	
 	SetTargetFPS(60);
 
 	while (!WindowShouldClose()) {
