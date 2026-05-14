@@ -18,15 +18,19 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Funcoes\main.cpp">
+    <ClCompile Include="Projeto\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Funcoes\movimentaPersonagem\movePersonagem.cpp">
+    <ClCompile Include="Projeto\Funcoes\funcoes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Projeto\Estruturas\estruturas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Funcoes\movimentaPersonagem\movePersonagem.h" />
+    <ClInclude Include="Projeto\Funcoes\funcoes.h" />
+    <ClInclude Include="Projeto\Estruturas\estruturas.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Texturas\Personagem\Personagem1.png" />
