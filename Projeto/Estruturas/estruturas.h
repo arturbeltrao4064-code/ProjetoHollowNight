@@ -12,7 +12,9 @@ typedef struct {
 
 typedef struct {
     Vector2 posicao;
+    Vector2 posicaoInicial;
     Texture2D imagem;
+    bool colidindo;
 } infoPersonagem;
 
 typedef struct {

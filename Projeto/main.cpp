@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <raylib.h>
-#include "C:/Users/carlos.vier/source/repos/ProjetoRollowNight/Projeto/Estruturas/estruturas.h"
+#include "Estruturas\estruturas.h"
 #include "Funcoes\funcoes.h"
 
 // Criamos uma variável para controlar onde o jogador está
