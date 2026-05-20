@@ -1,7 +1,7 @@
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
-#include "C:/Users/carlos.vier/source/repos/ProjetoRollowNight/Projeto/Estruturas/estruturas.h"
+#include "../Estruturas/estruturas.h"
 
 Vector2 movimentaPersoangem(Vector2);
 
