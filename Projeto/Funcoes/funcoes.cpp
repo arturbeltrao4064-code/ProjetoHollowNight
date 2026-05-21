@@ -52,16 +52,46 @@ void liberaMapa(char** matriz, int linhas) {
 
 Vector2 movimentaPersoangem(Vector2 posicaoAtual) {
     float velocidade = 5.0f;
-    if (IsKeyDown(KEY_LEFT) && posicaoAtual.x > 0) posicaoAtual.x -= velocidade;
-    if (IsKeyDown(KEY_RIGHT) && posicaoAtual.x < 1100) posicaoAtual.x += velocidade;
-    if (IsKeyDown(KEY_UP) && posicaoAtual.y > 0) posicaoAtual.y -= velocidade;
-    if (IsKeyDown(KEY_DOWN) && posicaoAtual.y < 700) posicaoAtual.y += velocidade;
+    static float velocidadey = 0; // static para lembrar o valor e nao reniciar toda vez
+    velocidadey += 0.5f; // Gravidade
+    posicaoAtual.y += velocidadey;  
 
+    int coluna = (int)((posicaoAtual.x + personagem.largura/2) / bloco.largura); // Verifica a parte do meio do personagem
+    int linha = (int)((posicaoAtual.y + 50 + personagem.altura)/ bloco.altura); // Verifica a parte de baixo do personagem
+
+     if (map.matrizMapa[linha][coluna] == 'P' && velocidadey >= 0) { // Colisão com o chão
+        // Lógica de colisão com o chão
+        velocidadey = 0; // Para o movimento vertical
+        posicaoAtual.y = (linha * bloco.altura) - personagem.altura - 50; // Ajusta a posição para ficar em cima do bloco - 50 para verificar a parte de baixo do personagem
+    }
+    int linhameio = (int)((posicaoAtual.y + 20 + personagem.altura/2) / bloco.altura); // Verifica a parte do meio do personagem
+    int colunadireita = (int)((posicaoAtual.x + personagem.largura) / bloco.largura);
+     if (IsKeyDown(KEY_D) && posicaoAtual.x > 0){
+        if (map.matrizMapa[linhameio][colunadireita] != 'P') {
+        // Lógica de colisão com paredes
+        posicaoAtual.x += velocidade; // Move para a direitad
+        }
+    }
+
+    int colunaesquerda = (int)(posicaoAtual.x / bloco.largura);
+    if (IsKeyDown(KEY_A) && posicaoAtual.x < 1500) {
+        if (map.matrizMapa[linhameio][colunaesquerda] != 'P') {
+        posicaoAtual.x -= velocidade; // Move para a esquerda
+        }
+    }
+
+    if (IsKeyPressed(KEY_W) && map.matrizMapa[linha][coluna] == 'P') {
+        velocidadey = -10.0f; // Pulo
+    }
+ 
     return posicaoAtual;
 }
 
+
+
 void startJogo(void) {
     // Atualização
+    personagem.posicao = movimentaPersoangem(personagem.posicao);
     // Desenho
     BeginDrawing();
         
@@ -91,7 +121,7 @@ void desenhaMapa(void) {
                     float posY = i * bloco.altura;
                     if (caractere == 'J') {
                         DrawTextureEx(personagem.imagem[0], personagem.posicao, 0, 0.3, WHITE);
-                        personagem.posicao = movimentaPersoangem(personagem.posicao);
+                        DrawRectangleLines(personagem.posicao.x, personagem.posicao.y + 50, personagem.largura, personagem.altura, ORANGE);
                     }
                     else if (caractere == 'C') {
                         DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, PURPLE);
@@ -137,7 +167,10 @@ void desenhaMenu(void) {
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTextureEx(tela.menuImagem[0],{0,0},0,1, WHITE);
+        Rectangle source = { 0, 0, tela.menuImagem[0].width, tela.menuImagem[0].height };   //CENTRALIZA A IMAGEM DO MENU NOVO Q EU COLOQUEI
+        Rectangle dest = { 0, 0, tela.largura, tela.altura };
+        DrawTexturePro(tela.menuImagem[0], source, dest, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawText("Pressione 'C' para jogar", 600, 450, 20, WHITE);
         EndDrawing();
     }
     else if (estadoAtual == ESTADO_JOGANDO) {

@@ -17,6 +17,8 @@ typedef struct {
     Vector2 posicaoInicial;
     Texture2D imagem[3];
     bool colidindo;
+    int largura;
+    int altura;
 } infoPersonagem;
 
 typedef struct {

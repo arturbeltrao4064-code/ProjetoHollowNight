@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Raylib",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "Projeto/main.cpp",
+                "Projeto/Funcoes/funcoes.cpp",
+                "Projeto/Estruturas/estruturas.cpp",
+
+                "-o",
+                "jogo.exe",
+
+                "-IC:/raylib/raylib/src",
+                "-LC:/raylib/raylib/src",
+
+                "-lraylib",
+                "-lopengl32",
+                "-lgdi32",
+                "-lwinmm"
+            ],
+
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+
+            "problemMatcher": []
+        }
+    ]
+}
