@@ -49,17 +49,6 @@ void liberaMapa(char** matriz, int linhas) {
     // 2. Só depois libera o ponteiro principal (a estante)
     free(matriz);
 }
-
-Vector2 movimentaPersoangem(Vector2 posicaoAtual) {
-    float velocidade = 5.0f;
-    if (IsKeyDown(KEY_LEFT) && posicaoAtual.x > 0) posicaoAtual.x -= velocidade;
-    if (IsKeyDown(KEY_RIGHT) && posicaoAtual.x < 1100) posicaoAtual.x += velocidade;
-    if (IsKeyDown(KEY_UP) && posicaoAtual.y > 0) posicaoAtual.y -= velocidade;
-    if (IsKeyDown(KEY_DOWN) && posicaoAtual.y < 700) posicaoAtual.y += velocidade;
-
-    return posicaoAtual;
-}
-
 void startJogo(void) {
     // Atualização
     // Desenho
@@ -90,6 +79,7 @@ void desenhaMapa(void) {
                     float posX = j * bloco.largura;
                     float posY = i * bloco.altura;
                     if (caractere == 'J') {
+                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, ORANGE);
                         DrawTextureEx(personagem.imagem[0], personagem.posicao, 0, 0.3, WHITE);
                         personagem.posicao = movimentaPersoangem(personagem.posicao);
                     }
@@ -97,7 +87,9 @@ void desenhaMapa(void) {
                         DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, PURPLE);
                     }
                     else if (caractere == 'P') {
-                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, WHITE);
+                        // Carrega local da img, Retangulo para recortar a img(x, y, largura, altura), posicao, cor;
+                        DrawTextureRec(map.mapaImagem[0],{ 0.0f, 96.0f, 32.0f, 32.0f },{posX, posY}, WHITE);
+                        
                     }
                     else if (caractere == 'A') {
                         DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, YELLOW);
@@ -119,12 +111,15 @@ Estado estadoAtual = ESTADO_MENU;
 
 void loadArquivos(void) {
     map.matrizMapa = leituraMapa(map);
+    map.mapaImagem[0] = LoadTexture("Texturas/Mapa/SpriteSheetMap.png");
     personagem.imagem[0] = LoadTexture("Texturas/Personagem/Personagem1.png");
-    tela.menuImagem[0] = LoadTexture("Texturas/Fundos/Menu/FundoMenu.png");;
+    tela.menuImagem[0] = LoadTexture("Texturas/Fundos/Menu/FundoMenu.png");
 }
 
 void unloadArquivos(void) {
     UnloadTexture(personagem.imagem[0]);
+    UnloadTexture(map.mapaImagem[0]);
+    UnloadTexture(tela.menuImagem[0]);
     liberaMapa(map.matrizMapa, map.linhas);
     CloseWindow();
 }
@@ -149,4 +144,37 @@ void desenhaMenu(void) {
             estadoAtual = ESTADO_MENU;
         }
     }
+}
+
+bool colisao(Vector2 posicao) {
+        int coluna = (int)(posicao.x / bloco.largura);
+        int linha = (int)(posicao.y / bloco.altura);
+
+        if (linha >= 0 && linha < map.linhas && coluna >= 0 && coluna < map.colunas) {
+            char caractere = map.matrizMapa[linha][coluna];
+            if (caractere == 'P') {
+                return true; // Colisão com parede
+            }else {
+                return false; // Sem colisão
+            }
+        }
+}
+
+Vector2 movimentaPersoangem(Vector2 posicaoAtual) {
+    while(true) {
+        if (IsKeyDown(KEY_LEFT) && posicaoAtual.x > 0) posicaoAtual.x -= personagem.velocidade;
+        if (IsKeyDown(KEY_RIGHT) && posicaoAtual.x < 1100) posicaoAtual.x += personagem.velocidade;
+        if (IsKeyDown(KEY_UP) && posicaoAtual.y > 0) posicaoAtual.y -= personagem.velocidade;
+        if (IsKeyDown(KEY_DOWN) && posicaoAtual.y < 700) posicaoAtual.y += personagem.velocidade;
+        // Verifica colisão e corrige posição se necessário
+        if (colisao(posicaoAtual)) {
+            // Se colidir, desfaz o movimento
+            if (IsKeyDown(KEY_LEFT)) posicaoAtual.x += personagem.velocidade;
+            if (IsKeyDown(KEY_RIGHT)) posicaoAtual.x -= personagem.velocidade;
+            if (IsKeyDown(KEY_UP)) posicaoAtual.y += personagem.velocidade;
+            if (IsKeyDown(KEY_DOWN)) posicaoAtual.y -= personagem.velocidade;
+        }
+        break; // Sai do loop após processar o movimento
+    }
+    return posicaoAtual;
 }
