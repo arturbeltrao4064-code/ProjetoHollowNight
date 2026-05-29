@@ -18,4 +18,5 @@ void desenhaMapa(void);
 void loadArquivos(void);
 
 void unloadArquivos(void);
+
 #endif

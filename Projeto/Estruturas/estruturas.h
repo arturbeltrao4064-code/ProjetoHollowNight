@@ -8,7 +8,6 @@ typedef struct {
     int largura;
     int altura;
     char titulo[20];
-    enum Estado { ESTADO_MENU, ESTADO_JOGANDO };
     Texture2D menuImagem[3];
 } infoTela;
 
@@ -18,6 +17,8 @@ typedef struct {
     Texture2D imagem[3];
     bool colidindo;
     float velocidade;
+    int largura;
+    int altura;
 } infoPersonagem;
 
 typedef struct {
@@ -32,6 +33,7 @@ typedef struct {
     float largura;
     float altura;
 } infoBloco;
+
 
 // 2. Declaração das variáveis como EXTERN
 // Isso diz ao C: "Essas variáveis existem, mas serão criadas em outro lugar"

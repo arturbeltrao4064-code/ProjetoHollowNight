@@ -4,13 +4,6 @@
 #include <stdlib.h>
 #include <raylib.h>
 
-char menu(void) {
-    // Por enquanto, apenas detecta se o jogador apertou 'C'
-    if (IsKeyPressed(KEY_C)) return 'c';
-    if (IsKeyPressed(KEY_S)) return 's';
-    if (IsKeyPressed(KEY_O)) return 'o';
-    return ' '; // Retorna vazio se nenhuma tecla do menu foi pressionada
-}
 void saveGame(void) {
     // Lógica de salvar futuramente
 }
@@ -105,9 +98,7 @@ void desenhaMapa(void) {
 
 }
 
-enum Estado { ESTADO_MENU, ESTADO_JOGANDO };
 
-Estado estadoAtual = ESTADO_MENU;
 
 void loadArquivos(void) {
     map.matrizMapa = leituraMapa(map);
@@ -124,15 +115,23 @@ void unloadArquivos(void) {
     CloseWindow();
 }
 
+enum Estado { ESTADO_MENU, ESTADO_JOGANDO };
+
+Estado estadoAtual = ESTADO_MENU;
+
 void desenhaMenu(void) {
+
+
     if (estadoAtual == ESTADO_MENU) {
-        if (IsKeyPressed(KEY_C)) {
+        if (IsKeyPressed(KEY_ENTER)) {
             estadoAtual = ESTADO_JOGANDO;
         }
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTextureEx(tela.menuImagem[0],{0,0},0,1, WHITE);
+        Rectangle source = { 0, 0, tela.menuImagem[0].width, tela.menuImagem[0].height };   //CENTRALIZA A IMAGEM DO MENU NOVO Q EU COLOQUEI
+        Rectangle dest = { 0, 0, tela.largura, tela.altura };
+        DrawTexturePro(tela.menuImagem[0], source, dest, {0}, 0.0f, WHITE);
         EndDrawing();
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
@@ -146,35 +145,39 @@ void desenhaMenu(void) {
     }
 }
 
-bool colisao(Vector2 posicao) {
-        int coluna = (int)(posicao.x / bloco.largura);
-        int linha = (int)(posicao.y / bloco.altura);
-
-        if (linha >= 0 && linha < map.linhas && coluna >= 0 && coluna < map.colunas) {
-            char caractere = map.matrizMapa[linha][coluna];
-            if (caractere == 'P') {
-                return true; // Colisão com parede
-            }else {
-                return false; // Sem colisão
-            }
-        }
-}
-
 Vector2 movimentaPersoangem(Vector2 posicaoAtual) {
-    while(true) {
-        if (IsKeyDown(KEY_LEFT) && posicaoAtual.x > 0) posicaoAtual.x -= personagem.velocidade;
-        if (IsKeyDown(KEY_RIGHT) && posicaoAtual.x < 1100) posicaoAtual.x += personagem.velocidade;
-        if (IsKeyDown(KEY_UP) && posicaoAtual.y > 0) posicaoAtual.y -= personagem.velocidade;
-        if (IsKeyDown(KEY_DOWN) && posicaoAtual.y < 700) posicaoAtual.y += personagem.velocidade;
-        // Verifica colisão e corrige posição se necessário
-        if (colisao(posicaoAtual)) {
-            // Se colidir, desfaz o movimento
-            if (IsKeyDown(KEY_LEFT)) posicaoAtual.x += personagem.velocidade;
-            if (IsKeyDown(KEY_RIGHT)) posicaoAtual.x -= personagem.velocidade;
-            if (IsKeyDown(KEY_UP)) posicaoAtual.y += personagem.velocidade;
-            if (IsKeyDown(KEY_DOWN)) posicaoAtual.y -= personagem.velocidade;
-        }
-        break; // Sai do loop após processar o movimento
+    float velocidade = 5.0f;
+    static float velocidadey = 0; // static para lembrar o valor e nao reniciar toda vez
+    velocidadey += 0.5f; // Gravidade
+    posicaoAtual.y += velocidadey;
+
+    int coluna = (int)((posicaoAtual.x + personagem.largura / 2) / bloco.largura); // Verifica a parte do meio do personagem
+    int linha = (int)((posicaoAtual.y + 50 + personagem.altura) / bloco.altura); // Verifica a parte de baixo do personagem
+
+    if (map.matrizMapa[linha][coluna] == 'P' && velocidadey >= 0) { // Colisão com o chão
+        // Lógica de colisão com o chão
+        velocidadey = 0; // Para o movimento vertical
+        posicaoAtual.y = (linha * bloco.altura) - personagem.altura - 50; // Ajusta a posição para ficar em cima do bloco - 50 para verificar a parte de baixo do personagem
     }
+    int linhameio = (int)((posicaoAtual.y + 20 + personagem.altura / 2) / bloco.altura); // Verifica a parte do meio do personagem
+    int colunadireita = (int)((posicaoAtual.x + personagem.largura) / bloco.largura);
+    if ((IsKeyDown(KEY_D)|| IsKeyDown(KEY_RIGHT)) && posicaoAtual.x > 0) {
+        if (map.matrizMapa[linhameio][colunadireita] != 'P') {
+            // Lógica de colisão com paredes
+            posicaoAtual.x += velocidade; // Move para a direitad
+        }
+    }
+
+    int colunaesquerda = (int)(posicaoAtual.x / bloco.largura);
+    if ((IsKeyDown(KEY_A)|| IsKeyDown(KEY_LEFT)) && posicaoAtual.x < 1500) {
+        if (map.matrizMapa[linhameio][colunaesquerda] != 'P') {
+            posicaoAtual.x -= velocidade; // Move para a esquerda
+        }
+    }
+
+    if ((IsKeyPressed(KEY_W)|| IsKeyPressed(KEY_UP)) && map.matrizMapa[linha][coluna] == 'P') {
+        velocidadey = -10.0f; // Pulo
+    }
+
     return posicaoAtual;
 }
