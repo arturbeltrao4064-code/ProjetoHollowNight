@@ -42,68 +42,44 @@ void liberaMapa(char** matriz, int linhas) {
     // 2. Só depois libera o ponteiro principal (a estante)
     free(matriz);
 }
-void startJogo(void) {
-    // Atualização
-    // Desenho
-    BeginDrawing();
-        
-    ClearBackground(BLACK);
 
-    desenhaMapa();
-
-    EndDrawing();
+void updateJogo(void) {
+    // Só lógica, zero desenho
+    personagem.posicao = movimentaPersonagem(personagem.posicao);
 }
+void desenhaPersonagem(void) {
+    DrawTextureEx(personagem.imagem[0], personagem.posicao, 0, 0.3f, WHITE);
+}
+
 void desenhaMapa(void) {
+    for (int i = 0; i < map.linhas; i++) {
+        for (int j = 0; j < map.colunas; j++) {
+            char c = map.matrizMapa[i][j];
+            float posX = j * bloco.largura;
+            float posY = i * bloco.altura;
 
-    // 2. Lógica para desenhar o mapa
-    //Legenda rapida: 
-    // J - jogador - personagem.imagem,laranja,
-    // C - Chefe - roxo;
-    // P - Parede - branco;
-    // A - Amuleto - Amarelo;
-    // H - Habilidade - Azul;
-    if (map.matrizMapa != NULL) {
-        for (int i = 0; i < map.linhas; i++) {
-            for (int j = 0; j < map.colunas; j++) {
-                // Verifica se o caractere não é espaço ou quebra de linha
-                char caractere = map.matrizMapa[i][j];
-
-                if (caractere != ' ' && caractere != '\n' && caractere != '\0' && caractere != '\r') {
-                    float posX = j * bloco.largura;
-                    float posY = i * bloco.altura;
-                    if (caractere == 'J') {
-                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, ORANGE);
-                        DrawTextureEx(personagem.imagem[0], personagem.posicao, 0, 0.3, WHITE);
-                        personagem.posicao = movimentaPersoangem(personagem.posicao);
-                    }
-                    else if (caractere == 'C') {
-                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, PURPLE);
-                    }
-                    else if (caractere == 'P') {
-                        // Carrega local da img, Retangulo para recortar a img(x, y, largura, altura), posicao, cor;
-                        DrawTextureRec(map.mapaImagem[0],{ 0.0f, 96.0f, 32.0f, 32.0f },{posX, posY}, WHITE);
-                        
-                    }
-                    else if (caractere == 'A') {
-                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, YELLOW);
-                    }
-                    else if (caractere == 'H') {
-                        DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, BLUE);
-                    }
-
-                }
+            if (c == 'P') {
+                DrawTextureRec(map.mapaImagem[0], { 0,96,32,32 }, { posX,posY }, WHITE);
             }
+            else if (c == 'C') DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, PURPLE);
+            else if (c == 'A') DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, YELLOW);
+            else if (c == 'H') DrawRectangle(posX, posY, bloco.largura - 1, bloco.altura - 1, BLUE);
+            // ❌ Sem 'J' aqui, personagem é desenhado separado
         }
     }
-
 }
 
-
+void drawJogo(void) {
+    ClearBackground(BLACK);
+    desenhaMapa();      // só desenha blocos
+    desenhaPersonagem(); // só desenha o personagem
+}
 
 void loadArquivos(void) {
     map.matrizMapa = leituraMapa(map);
     map.mapaImagem[0] = LoadTexture("Texturas/Mapa/SpriteSheetMap.png");
-    personagem.imagem[0] = LoadTexture("Texturas/Personagem/Personagem1.png");
+    personagem.imagem[0] = LoadTexture("Texturas/Personagem/Personagem.png");
+    personagem.imagem[1] = LoadTexture("Texturas/Personagem/InvertePersonagem.png");
     tela.menuImagem[0] = LoadTexture("Texturas/Fundos/Menu/FundoMenu.png");
 }
 
@@ -120,32 +96,32 @@ enum Estado { ESTADO_MENU, ESTADO_JOGANDO };
 Estado estadoAtual = ESTADO_MENU;
 
 void desenhaMenu(void) {
-
-
+    // UPDATE
     if (estadoAtual == ESTADO_MENU) {
-        if (IsKeyPressed(KEY_ENTER)) {
-            estadoAtual = ESTADO_JOGANDO;
-        }
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-        Rectangle source = { 0, 0, tela.menuImagem[0].width, tela.menuImagem[0].height };   //CENTRALIZA A IMAGEM DO MENU NOVO Q EU COLOQUEI
-        Rectangle dest = { 0, 0, tela.largura, tela.altura };
-        DrawTexturePro(tela.menuImagem[0], source, dest, {0}, 0.0f, WHITE);
-        EndDrawing();
+        if (IsKeyPressed(KEY_ENTER)) estadoAtual = ESTADO_JOGANDO;
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
-        // Se estiver jogando, chama a função de lógica/desenho
-        startJogo();
-
-        // Se apertar ESC, volta para o menu
-        if (IsKeyPressed(KEY_M)) {
-            estadoAtual = ESTADO_MENU;
-        }
+        updateJogo(); // ← lógica separada
+        if (IsKeyPressed(KEY_M)) estadoAtual = ESTADO_MENU;
     }
+
+    // DRAW
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    if (estadoAtual == ESTADO_MENU) {
+        Rectangle source = { 0, 0, (float)tela.menuImagem[0].width, (float)tela.menuImagem[0].height };
+        Rectangle dest = { 0, 0, (float)tela.largura, (float)tela.altura };
+        DrawTexturePro(tela.menuImagem[0], source, dest, { 0 }, 0.0f, WHITE);
+    }
+    else if (estadoAtual == ESTADO_JOGANDO) {
+        drawJogo(); // ← desenho separado, mas sem BeginDrawing/EndDrawing interno
+    }
+
+    EndDrawing();
 }
 
-Vector2 movimentaPersoangem(Vector2 posicaoAtual) {
+Vector2 movimentaPersonagem(Vector2 posicaoAtual) {
     float velocidade = 5.0f;
     static float velocidadey = 0; // static para lembrar o valor e nao reniciar toda vez
     velocidadey += 0.5f; // Gravidade

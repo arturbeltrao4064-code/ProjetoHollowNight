@@ -19,6 +19,7 @@ typedef struct {
     float velocidade;
     int largura;
     int altura;
+    enum DIRECAO {DIREITA,ESQUERDA};
 } infoPersonagem;
 
 typedef struct {

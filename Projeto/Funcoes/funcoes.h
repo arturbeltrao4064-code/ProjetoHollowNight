@@ -3,7 +3,7 @@
 
 #include "../Estruturas/estruturas.h"
 
-Vector2 movimentaPersoangem(Vector2);
+Vector2 movimentaPersonagem(Vector2);
 
 char** leituraMapa(infoMapa info);
 
@@ -18,5 +18,11 @@ void desenhaMapa(void);
 void loadArquivos(void);
 
 void unloadArquivos(void);
+
+void updateJogo(void);
+
+void drawJogo(void);
+
+void desenhaPersonagem(void);
 
 #endif

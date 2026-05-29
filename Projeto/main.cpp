@@ -9,11 +9,13 @@
 
 int main(void) {
     InitWindow(tela.largura, tela.altura, tela.titulo);
+
     SetTargetFPS(60);
 
     loadArquivos();
+
     while (!WindowShouldClose()) {
-        desenhaMenu();
+        desenhaMenu(); // que internamente chama update e draw separados
     }
     unloadArquivos();
     return 0;
