@@ -2,32 +2,31 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Raylib",
+            "label": "Compilar HollowKnight",
             "type": "shell",
-            "command": "gcc",
+            "command": "g++",
             "args": [
+                "-g",
                 "Projeto/main.cpp",
                 "Projeto/Funcoes/funcoes.cpp",
                 "Projeto/Estruturas/estruturas.cpp",
-
                 "-o",
-                "jogo.exe",
-
-                "-IC:/raylib/raylib/src",
-                "-LC:/raylib/raylib/src",
-
+                "jogo",
                 "-lraylib",
-                "-lopengl32",
-                "-lgdi32",
-                "-lwinmm"
+                "-lGL",
+                "-lm",
+                "-lpthread",
+                "-ldl",
+                "-lrt",
+                "-lX11"
             ],
-
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-
-            "problemMatcher": []
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

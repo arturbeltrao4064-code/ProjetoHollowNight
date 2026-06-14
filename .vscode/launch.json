@@ -2,29 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Raylib Debug",
-
+            "name": "Executar HollowKnight",
             "type": "cppdbg",
-
             "request": "launch",
-
-            "program": "${workspaceFolder}/jogo.exe",
-
+            "program": "${workspaceFolder}/jogo",
             "args": [],
-
             "stopAtEntry": false,
-
             "cwd": "${workspaceFolder}",
-
             "environment": [],
-
-            "externalConsole": true,
-
+            "externalConsole": false,
             "MIMode": "gdb",
-
-            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
-
-            "preLaunchTask": "Build Raylib"
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "Compilar HollowKnight"
         }
     ]
 }

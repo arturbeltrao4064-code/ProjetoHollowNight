@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <raylib.h>
-#include "Estruturas\estruturas.h"
-#include "Funcoes\funcoes.h"
+#include "Estruturas/estruturas.h"
+#include "Funcoes/funcoes.h"
 
-// Criamos uma variável para controlar onde o jogador está
+// Criamos uma variï¿½vel para controlar onde o jogador estï¿½
 
 int main(void) {
     InitWindow(tela.largura, tela.altura, tela.titulo);
