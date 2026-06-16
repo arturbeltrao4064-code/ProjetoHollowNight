@@ -31,7 +31,6 @@ void loadMapa() {
     map.matrizMapa = leituraMapa(map);
     map.mapaImagem[0] = LoadTexture("Texturas/Mapa/SpriteSheetMap.png");
 }
-
 void unloadMapa() {
     UnloadTexture(map.mapaImagem[0]);
     liberaMapa(map.matrizMapa, map.linhas);

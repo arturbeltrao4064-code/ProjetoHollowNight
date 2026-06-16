@@ -22,7 +22,7 @@ infoPersonagem personagem = {
 infoMapa map = { 
     151, 
     16, 
-    "Mapas/MapaTeste.txt", 
+    "Mapas/MapaTeste.txt",
     nullptr
 };
 
