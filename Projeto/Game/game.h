@@ -5,7 +5,8 @@
 
 void loadJogo();
 void unloadJogo();
-void updateJogo();
+void updateJogo(); 
 void drawJogo();
+void drawFundo();
 
 #endif

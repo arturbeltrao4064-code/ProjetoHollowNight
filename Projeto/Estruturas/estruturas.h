@@ -8,6 +8,7 @@ typedef struct {
     int altura;
     char titulo[20];
     Texture2D menuImagem[3];
+    Texture2D fundoJogo;      // ← adiciona
     Camera2D camera;
 } infoTela;
 
