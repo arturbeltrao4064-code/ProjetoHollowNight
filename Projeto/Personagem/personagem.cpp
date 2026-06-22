@@ -18,10 +18,8 @@ void updatePersonagem() {
 
     personagem.posicao = movimentaPersonagem(personagem.posicao);
 }
-
 void desenhaPersonagem() {
-    Texture2D tex = personagem.olhandoDireita ? personagem.imagem[0] : personagem.imagem[1];
-    DrawTextureEx(tex, personagem.posicao, 0, 0.23f, WHITE);
+    DrawRectangle((int)personagem.posicao.x, (int)personagem.posicao.y, personagem.largura, personagem.altura, GREEN);
 }
 
 // Retorna true se o bloco na posição (px, py) do mundo é sólido

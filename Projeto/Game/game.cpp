@@ -56,10 +56,10 @@ void drawFundo() {
 
 
 void drawJogo() {
-    ClearBackground({ 5, 5, 20, 255 });
+    ClearBackground(PURPLE);
 
     BeginMode2D(tela.camera);
-        drawFundo();
+       // drawFundo();
         desenhaMapa();
         desenhaPersonagem();
     EndMode2D();

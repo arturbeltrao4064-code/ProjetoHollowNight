@@ -31,6 +31,10 @@ typedef struct {
     Texture2D mapaImagem[3];
 } infoMapa;
 
+typedef struct{
+char Estado[4];
+}infoMenu;
+
 typedef struct {
     float largura;
     float altura;
@@ -40,4 +44,5 @@ extern infoTela tela;
 extern infoPersonagem personagem;
 extern infoMapa map;
 extern infoBloco bloco;
+extern infoMenu menu;
 #endif

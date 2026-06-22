@@ -9,7 +9,7 @@ infoTela tela = {
     { 0 },  // menuImagem
     { 0 },  // menuBotoes  ← adiciona essa linha
     { 0 },  // fundoJogo
-    { {0,0}, {0,0}, 0.0f, 3.0f }  // camera
+    { {0,0}, {0,0}, 0.0f, 2.0f }  // camera
 };
 
 infoPersonagem personagem = {
@@ -19,8 +19,7 @@ infoPersonagem personagem = {
     false,        // colidindo
     5.0f,         // velocidade
     20,           // largura
-    40,           // altura
-    true          // olhandoDireita
+    40            // altura
 };
 
 infoMapa map = { 
