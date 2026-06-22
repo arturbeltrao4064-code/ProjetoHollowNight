@@ -104,7 +104,7 @@ Vector2 movimentaPersonagem(Vector2 posicaoAtual) {
     bool noChaoDir = blocoSolido(x + w - 2, y + h + 1);
     bool noChao    = noChaoEsq || noChaoDir;
 
-    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)) && noChao) {
+    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE)) && noChao) {
         velocidadeY = forcaPulo;
     }
 

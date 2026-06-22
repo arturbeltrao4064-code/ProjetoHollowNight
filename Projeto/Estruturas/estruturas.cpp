@@ -9,7 +9,7 @@ infoTela tela = {
     { 0 },  // menuImagem
     { 0 },  // menuBotoes  ← adiciona essa linha
     { 0 },  // fundoJogo
-    { {0,0}, {0,0}, 0.0f, 1.7f }  // camera
+    { {0,0}, {0,0}, 0.0f, 3.0f }  // camera
 };
 
 infoPersonagem personagem = {
@@ -25,7 +25,7 @@ infoPersonagem personagem = {
 infoMapa map = { 
     151, 
     16, 
-    "Mapas/MapaTeste.txt",
+    "Mapa/MapaTeste.txt",
     nullptr
 };
 

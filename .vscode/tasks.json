@@ -4,7 +4,7 @@
         {
             "type": "shell",
             "label": "Compilar e Rodar Raylib",
-            "command": "cd ${workspaceFolder}\\Projeto && g++ main.cpp Estruturas/estruturas.cpp Mapa/mapa.cpp Personagem/personagem.cpp Game/game.cpp Menu/menu.cpp -o programa.exe -I raylib/include -L raylib/lib -lraylib -lopengl32 -lgdi32 -lwinmm && programa.exe",
+            "command": "cd ${workspaceFolder}\\Projeto && g++ main.cpp Estruturas/estruturas.cpp Mapa/mapa.cpp Personagem/personagem.cpp Game/game.cpp Hud/hud.cpp Menu/menu.cpp -o programa.exe -I raylib/include -L raylib/lib -lraylib -lopengl32 -lgdi32 -lwinmm && programa.exe",
             "args": [],
             "group": {
                 "kind": "build",

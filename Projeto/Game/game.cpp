@@ -2,6 +2,8 @@
 #include "../Mapa/mapa.h"
 #include "../Personagem/personagem.h"
 #include <raylib.h>
+#include "../Hud/hud.h"
+
 
 void loadJogo() {
     loadMapa();
@@ -50,13 +52,14 @@ void drawFundo() {
         }
     }
 }
-
 void drawJogo() {
     ClearBackground({ 5, 5, 20, 255 });
 
-    BeginMode2D(tela.camera);  // ← drawFundo agora dentro
+    BeginMode2D(tela.camera);
         drawFundo();
         desenhaMapa();
         desenhaPersonagem();
     EndMode2D();
+
+    desenhaHud(); // ← fora da câmera, fixo na tela
 }
