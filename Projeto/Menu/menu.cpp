@@ -3,23 +3,25 @@
 #include <raylib.h>
 #include <cstdlib>
 
-enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_CONFIGURACOES };
+enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES };
 Estado estadoAtual = ESTADO_MENU;
 
 const int totalOpcoes = 4;
 int opcaoSelecionada  = 0;
+const int botoesY[]   = { 294, 361, 428, 495 };
+const int botaoW      = 320;
+const int botaoH      = 60;
 
-// Posicao central Y de cada botao na tela (ajuste se necessario)
-const int botoesY[] = { 294, 361, 428, 495 };
-
-// Largura e altura que cada botao vai ser desenhado na tela
-const int botaoW = 320;
-const int botaoH = 60;
+const int totalPause     = 4;
+int opcaoPause           = 0;
+const int pauseBotoesY[] = { 220, 290, 360, 430 };
+const int pauseBotaoW    = 260;
+const int pauseBotaoH    = 55;
 
 const char* opcoesConfig[] = { "Volume", "Voltar" };
-const int totalConfig = 2;
-int opcaoConfig = 0;
-const int botoesConfigY[] = { 294, 361 };
+const int totalConfig      = 2;
+int opcaoConfig            = 0;
+const int botoesConfigY[]  = { 294, 361 };
 
 void loadMenu() {
     tela.menuImagem[0] = LoadTexture("Texturas/Fundos/Menu/FundoMenu.png");
@@ -27,11 +29,12 @@ void loadMenu() {
     tela.menuBotoes[1] = LoadTexture("Texturas/Fundos/Menu/BotaoCarregar.png");
     tela.menuBotoes[2] = LoadTexture("Texturas/Fundos/Menu/BotaoOpcoes.png");
     tela.menuBotoes[3] = LoadTexture("Texturas/Fundos/Menu/BotaoSair.png");
+    tela.menuBotoes[4] = LoadTexture("Texturas/Fundos/Menu/BotaoSalvar.png");
 }
 
 void unloadMenu() {
     UnloadTexture(tela.menuImagem[0]);
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
         UnloadTexture(tela.menuBotoes[i]);
 }
 
@@ -41,24 +44,32 @@ static void desenhaFundoMenu() {
     DrawTexturePro(tela.menuImagem[0], source, dest, { 0 }, 0.0f, WHITE);
 }
 
-static void desenhaBotao(int index, int selecionado) {
-    Texture2D tex = tela.menuBotoes[index];
-
-    // Calcula posicao centralizada
-    float x = tela.largura  / 2.0f - botaoW / 2.0f;
-    float y = botoesY[index] - botaoH / 2.0f;
-
-    // Esmaece o botao Carregar (nao implementado)
-    Color cor = (index == 1) ? DARKGRAY : WHITE;
+static void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado = false) {
+    Texture2D tex = tela.menuBotoes[texIndex];
+    float x = tela.largura / 2.0f - botaoW / 2.0f;
+    float y = botoesY[posIndex] - botaoH / 2.0f;
+    Color cor = desabilitado ? DARKGRAY : WHITE;
 
     Rectangle source = { 0, 0, (float)tex.width, (float)tex.height };
     Rectangle dest   = { x, y, (float)botaoW, (float)botaoH };
     DrawTexturePro(tex, source, dest, { 0 }, 0.0f, cor);
 
-    // Borda branca no botao selecionado
-    if (index == selecionado && index != 1) {
+    if (posIndex == selecionado && !desabilitado)
         DrawRectangleLinesEx({ x - 2, y - 2, (float)botaoW + 4, (float)botaoH + 4 }, 2, WHITE);
-    }
+}
+
+static void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabilitado = false) {
+    Texture2D tex = tela.menuBotoes[texIndex];
+    float x = tela.largura / 2.0f - pauseBotaoW / 2.0f; // centralizado
+    float y = pauseBotoesY[posIndex] - pauseBotaoH / 2.0f;
+    Color cor = desabilitado ? DARKGRAY : WHITE;
+
+    Rectangle source = { 0, 0, (float)tex.width, (float)tex.height };
+    Rectangle dest   = { x, y, (float)pauseBotaoW, (float)pauseBotaoH };
+    DrawTexturePro(tex, source, dest, { 0 }, 0.0f, cor);
+
+    if (posIndex == selecionado && !desabilitado)
+        DrawRectangleLinesEx({ x - 2, y - 2, (float)pauseBotaoW + 4, (float)pauseBotaoH + 4 }, 2, WHITE);
 }
 
 static void updateMenuPrincipal() {
@@ -67,12 +78,9 @@ static void updateMenuPrincipal() {
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
         opcaoSelecionada = (opcaoSelecionada - 1 + totalOpcoes) % totalOpcoes;
 
-    // Pula o Carregar (index 1) que esta desabilitado
     if (opcaoSelecionada == 1) {
-        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
-            opcaoSelecionada = 2;
-        else
-            opcaoSelecionada = 0;
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) opcaoSelecionada = 2;
+        else opcaoSelecionada = 0;
     }
 
     if (IsKeyPressed(KEY_ENTER)) {
@@ -81,6 +89,30 @@ static void updateMenuPrincipal() {
             case 1: /* Carregar — futuro */              break;
             case 2: estadoAtual = ESTADO_CONFIGURACOES; break;
             case 3: CloseWindow(); exit(0);             break;
+        }
+    }
+}
+
+static void updatePause() {
+    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+        opcaoPause = (opcaoPause + 1) % totalPause;
+    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+        opcaoPause = (opcaoPause - 1 + totalPause) % totalPause;
+
+    if (opcaoPause == 1) {
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) opcaoPause = 2;
+        else opcaoPause = 0;
+    }
+
+    if (IsKeyPressed(KEY_ESCAPE))
+        estadoAtual = ESTADO_JOGANDO;
+
+    if (IsKeyPressed(KEY_ENTER)) {
+        switch (opcaoPause) {
+            case 0: estadoAtual = ESTADO_JOGANDO; break;
+            case 1: /* Salvar — futuro */          break;
+            case 2: estadoAtual = ESTADO_MENU;    break;
+            case 3: CloseWindow(); exit(0);        break;
         }
     }
 }
@@ -102,8 +134,13 @@ void desenhaMenu() {
         updateMenuPrincipal();
     else if (estadoAtual == ESTADO_JOGANDO) {
         updateJogo();
-        if (IsKeyPressed(KEY_M)) estadoAtual = ESTADO_MENU;
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            estadoAtual = ESTADO_PAUSADO;
+            opcaoPause  = 0;
+        }
     }
+    else if (estadoAtual == ESTADO_PAUSADO)
+        updatePause();
     else if (estadoAtual == ESTADO_CONFIGURACOES)
         updateConfiguracoes();
 
@@ -113,17 +150,31 @@ void desenhaMenu() {
 
     if (estadoAtual == ESTADO_MENU) {
         desenhaFundoMenu();
-
         for (int i = 0; i < totalOpcoes; i++)
-            desenhaBotao(i, opcaoSelecionada);
-
+            desenhaBotao(i, i, opcaoSelecionada, i == 1);
         DrawText("W/S = Navegar | ENTER = Selecionar",
             tela.largura / 2 - MeasureText("W/S = Navegar | ENTER = Selecionar", 16) / 2,
             tela.altura - 30, 16, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
         drawJogo();
-        DrawText("M = Menu", 10, 10, 18, DARKGRAY);
+        const char* hint = "ESC = Pause";
+        DrawText(hint, tela.largura - MeasureText(hint, 18) - 10, 10, 18, DARKGRAY);
+    }
+    else if (estadoAtual == ESTADO_PAUSADO) {
+        drawJogo();
+        DrawRectangle(0, 0, tela.largura, tela.altura, { 0, 0, 0, 120 });
+
+        const char* titulo = "Pausado";
+        DrawText(titulo, tela.largura / 2 - MeasureText(titulo, 32) / 2, 160, 32, WHITE);
+
+        desenhaBotaoPause(0, 0, opcaoPause);
+        desenhaBotaoPause(4, 1, opcaoPause, true);
+        desenhaBotaoPause(1, 2, opcaoPause);
+        desenhaBotaoPause(3, 3, opcaoPause);
+
+        const char* hint = "W/S = Navegar | ENTER = Selecionar | ESC = Continuar";
+        DrawText(hint, tela.largura / 2 - MeasureText(hint, 14) / 2, tela.altura - 30, 14, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_CONFIGURACOES) {
         desenhaFundoMenu();

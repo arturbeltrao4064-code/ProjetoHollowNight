@@ -19,7 +19,8 @@ infoPersonagem personagem = {
     false,        // colidindo
     5.0f,         // velocidade
     20,           // largura
-    40            // altura
+    40,           // altura
+    true          // olhandoDireita
 };
 
 infoMapa map = { 

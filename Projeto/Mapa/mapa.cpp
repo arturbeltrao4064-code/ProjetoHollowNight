@@ -19,6 +19,7 @@ char** leituraMapa(infoMapa info) {
     return matriz;
 }
 
+
 void liberaMapa(char** matriz, int linhas) {
     if (matriz == NULL) return;
     for (int i = 0; i < linhas; i++) {
@@ -44,12 +45,35 @@ void desenhaMapa() {
             float posX = j * bloco.largura;
             float posY = i * bloco.altura;
 
+            // Verifica se é espaço vazio mas tem um 'P' vizinho
+            // Se sim, desenha bloco decorativo sem colisão
+            if (c == ' ' || c == '\0' || c == '\n' || c == '\r') {
+                bool temVizinhoP = false;
+                for (int di = -4; di <= 4 && !temVizinhoP; di++) {
+                    for (int dj = -4; dj <= 4 && !temVizinhoP; dj++) {
+                        int ni = i + di;
+                        int nj = j + dj;
+                        if (ni >= 0 && ni < map.linhas && nj >= 0 && nj < map.colunas) {
+                            if (map.matrizMapa[ni][nj] == 'P') {
+                                temVizinhoP = true;
+                            }
+                        }
+                    }
+                }
+                if (temVizinhoP) {
+                    // Desenha mais escuro para diferenciar do bloco real
+                    DrawTextureRec(map.mapaImagem[0], { 0, 96, 32, 32 }, { posX, posY }, { 150, 150, 150, 255 });
+                }
+                continue;
+            }
+
+            // Blocos normais
             if (c == 'P') {
                 DrawTextureRec(map.mapaImagem[0], { 0, 96, 32, 32 }, { posX, posY }, WHITE);
             }
-            else if (c == 'C') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura - 1), (int)(bloco.altura - 1), PURPLE);
-            else if (c == 'A') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura - 1), (int)(bloco.altura - 1), YELLOW);
-            else if (c == 'H') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura - 1), (int)(bloco.altura - 1), BLUE);
+            else if (c == 'C') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura-1), (int)(bloco.altura-1), PURPLE);
+            else if (c == 'A') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura-1), (int)(bloco.altura-1), YELLOW);
+            else if (c == 'H') DrawRectangle((int)posX, (int)posY, (int)(bloco.largura-1), (int)(bloco.altura-1), BLUE);
         }
     }
 }

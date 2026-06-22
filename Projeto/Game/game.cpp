@@ -52,6 +52,9 @@ void drawFundo() {
         }
     }
 }
+
+
+
 void drawJogo() {
     ClearBackground({ 5, 5, 20, 255 });
 

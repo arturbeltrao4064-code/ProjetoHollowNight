@@ -6,6 +6,7 @@
 
 int main(void) {
     InitWindow(tela.largura, tela.altura, tela.titulo);
+    SetExitKey(KEY_NULL); //desativa ESC como tecla de fechar
     SetTargetFPS(60);
 
     loadJogo();

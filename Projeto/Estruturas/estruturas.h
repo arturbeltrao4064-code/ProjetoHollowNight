@@ -7,7 +7,7 @@ typedef struct {
     int altura;
     char titulo[20];
     Texture2D menuImagem[3];
-    Texture2D menuBotoes[4];  // ← texturas dos 4 botoes: Jogar, Carregar, Opcoes, Sair
+    Texture2D menuBotoes[5];  // ← texturas dos 4 botoes: Jogar, Carregar, Opcoes, Sair
     Texture2D fundoJogo;
     Camera2D camera;
 } infoTela;
@@ -20,6 +20,7 @@ typedef struct {
     float velocidade;
     int largura;
     int altura;
+    bool olhandoDireita;  // ← adiciona aqui
 } infoPersonagem;
 
 typedef struct {

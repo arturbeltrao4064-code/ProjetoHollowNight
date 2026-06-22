@@ -13,11 +13,15 @@ void unloadPersonagem() {
 }
 
 void updatePersonagem() {
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) personagem.olhandoDireita = true;
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))  personagem.olhandoDireita = false;
+
     personagem.posicao = movimentaPersonagem(personagem.posicao);
 }
 
 void desenhaPersonagem() {
-    DrawTextureEx(personagem.imagem[0], personagem.posicao, 0, 0.25f, WHITE);
+    Texture2D tex = personagem.olhandoDireita ? personagem.imagem[0] : personagem.imagem[1];
+    DrawTextureEx(tex, personagem.posicao, 0, 0.23f, WHITE);
 }
 
 // Retorna true se o bloco na posição (px, py) do mundo é sólido
