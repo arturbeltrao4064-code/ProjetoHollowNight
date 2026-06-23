@@ -9,20 +9,27 @@ infoTela tela = {
     { {0,0}, {0,0}, 0.0f, 2.0f }  // camera
 };
 
-infoPersonagem personagem = {
+infoEntidade personagem = {
     { 50, 130 },  // posicao
     { 50, 130 },  // posicaoInicial
     { 0 },        // imagem
     false,        // colidindo
     5.0f,         // velocidade
     30,           // largura
-    30            // altura
+    30,       // altura
+    true,         // olhandoDireita
+    {  // dados
+        100, //hp
+        50, //mp
+        10, //ataque
+        5 //defesa
+    } 
 };
 
 infoMapa map = { 
     151, 
     16, 
-    "Mapa/MapaTeste.txt",
+    {"Mapa/Mapas/mapaInicial.txt"},
     nullptr
 };
 
@@ -48,9 +55,9 @@ infoMenu menuPause = {
 };
 
 infoMenu menuConfiguracoes = {
-    2,          // totalOpcoes
+    3,          // totalOpcoes
     0,          // opcaoSelecionada
-    { 294, 361 },  // botoesY
+    { 294, 361, 428 },  // botoesY
     200,        // botaoW
     50          // botaoH
 };

@@ -3,7 +3,6 @@
 #include <raylib.h>
 #include <cstdlib>
 
-enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES };
 Estado estadoAtual = ESTADO_MENU;
 
 void loadMenu() {
@@ -70,6 +69,8 @@ void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabil
 }
 
 void updateMenuPrincipal() {
+    // Navegação do menu
+    // Navegação com as teclas W/S ou UP/DOWN, e seleção com ENTER
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada + 1) % menuPrincipal.totalOpcoes;
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
@@ -79,7 +80,7 @@ void updateMenuPrincipal() {
         if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) menuPrincipal.opcaoSelecionada = 2;
         else menuPrincipal.opcaoSelecionada = 0;
     }
-
+    
     if (IsKeyPressed(KEY_ENTER)) {
         switch (menuPrincipal.opcaoSelecionada) {
             case 0: estadoAtual = ESTADO_JOGANDO;       break;
@@ -87,6 +88,20 @@ void updateMenuPrincipal() {
             case 2: estadoAtual = ESTADO_CONFIGURACOES; break;
             case 3: CloseWindow(); exit(0);             break;
         }
+    }
+    // Navegação com as as teclas de atalho (N para novo jogo, C para carregar, O para opções, S para sair)
+    if(IsKeyPressed(KEY_N)){
+        estadoAtual = ESTADO_JOGANDO;
+    }
+    if(IsKeyPressed(KEY_C)){
+        // Carregar — futuro
+    }
+    if(IsKeyPressed(KEY_O)){
+        estadoAtual = ESTADO_CONFIGURACOES;
+    }
+    if(IsKeyPressed(KEY_S)){
+        CloseWindow(); 
+        exit(0);
     }
 }
 
@@ -155,7 +170,7 @@ void desenhaMenu() {
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
         drawJogo();
-        const char* hint = "ESC = Pause";
+        const char* hint = "ESC = Pause";// Dica para pausar o jogo
         DrawText(hint, tela.largura - MeasureText(hint, 18) - 10, 10, 18, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_PAUSADO) {
@@ -176,7 +191,7 @@ void desenhaMenu() {
     else if (estadoAtual == ESTADO_CONFIGURACOES) {
         desenhaFundoMenu();
         const char* titulo = "Configuracoes";
-        const char* opcoes[2] = { "Volume", "Voltar" };
+        const char* opcoes[3] = { "Volume", "Controles e Informacoes", "Voltar" };
         DrawText(titulo, tela.largura / 2 - MeasureText(titulo, 40) / 2, 200, 40, WHITE);
         for (int i = 0; i < menuConfiguracoes.totalOpcoes; i++) {
             int fontSize = (i == menuConfiguracoes.opcaoSelecionada) ? 32 : 26;
