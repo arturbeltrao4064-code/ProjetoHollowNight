@@ -11,6 +11,10 @@ void desenhaPersonagem();
 void verificaColisaoAmuletos();
 void coletaAmuleto(TipoAmuleto tipo);
 void inicializaAmuletos();
+void coletaHabilidade();
+void verificaColisaoHabilidades();
+void disparaHabilidade();
+void atualizaHabilidade();
 Vector2 movimentaPersonagem(Vector2 posicaoAtual);
 
 #endif

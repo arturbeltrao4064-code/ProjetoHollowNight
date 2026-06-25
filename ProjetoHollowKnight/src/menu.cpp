@@ -1,9 +1,11 @@
 #include "menu.h"
 #include "game.h"
 #include "mapa.h"
+#include "personagem.h"
 #include "save.h"
 
 #include <raylib.h>
+#include <stdio.h>
 #include <cstdlib>
 
 Estado estadoAtual = ESTADO_MENU;
@@ -101,6 +103,7 @@ void desenhaInventario() {
     DrawText("Amuletos Coletados: ", invX + 30, invY + 70, 18, WHITE);
     
     char contadorText[20];
+    sprintf(contadorText, "%d", personagem.dados.amuletosColetados);
     DrawText(contadorText, invX + 280, invY + 70, 18, YELLOW);
 
     // Listar os amuletos lado a lado
@@ -212,7 +215,7 @@ void updateMenuPrincipal() {
             break;
             case 1: // Carregar
             carregaJogo();
-            
+
             unloadMapa();
             // Carrega o mapa correto baseado na fase
             switch (faseDoJogo) {

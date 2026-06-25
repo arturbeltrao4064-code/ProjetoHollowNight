@@ -15,7 +15,7 @@ void unloadInimigo() {
     UnloadTexture(listaInimigos[0].imagem[1]);
 }
 
-Vector2 movimentaInimigoEspecifico(int indice, Vector2 posicaoAtual) {
+Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual) {
     float x = posicaoAtual.x;
     float y = posicaoAtual.y;
     float w = (float)listaInimigos[indice].largura;
@@ -68,7 +68,7 @@ void updateInimigo() {
     // Atualiza todos os inimigos vivos do array
     for (int i = 0; i < quantidadeInimigos; i++) {
         if (listaInimigos[i].dados.vivo) {
-            listaInimigos[i].posicao = movimentaInimigoEspecifico(i, listaInimigos[i].posicao);
+            listaInimigos[i].posicao = movimentaInimigo(i, listaInimigos[i].posicao);
         }
     }
 }

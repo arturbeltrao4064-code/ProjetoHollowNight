@@ -8,6 +8,6 @@ void loadInimigo();
 void unloadInimigo();
 void updateInimigo();
 void desenhaInimigo();
-Vector2 movimentaInimigo(Vector2 posicaoAtual);
+Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual);
 
 #endif

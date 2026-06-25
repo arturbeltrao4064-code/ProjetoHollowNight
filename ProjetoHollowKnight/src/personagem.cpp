@@ -2,6 +2,8 @@
 #include "mapa.h"
 #include <raylib.h>
 
+static float tempoAtaque = 0.0f;
+
 void loadPersonagem() {
     personagem.imagem[0] = LoadTexture("Texturas/Personagem/Personagem.png");
     personagem.imagem[1] = LoadTexture("Texturas/Personagem/InvertePersonagem.png");
@@ -13,131 +15,27 @@ void unloadPersonagem() {
     UnloadTexture(personagem.imagem[1]);
 }
 
-void inicializaAmuletos() {
-    for (int i = 0; i < TOTAL_AMULETOS; i++) {
-        personagem.dados.amuletos[i].coletado = false;
-    }
-}
-
-void coletaAmuleto(TipoAmuleto tipo) {
-    if (!personagem.dados.amuletos[tipo].coletado) {
-        personagem.dados.amuletos[tipo].coletado = true;
-        personagem.dados.amuletosColetados++;
-        
-        switch (tipo) {
-            case AMULETO_ATAQUE:
-                personagem.dados.valorAtaque += 10;
-                break;
-            case AMULETO_DEFESA:
-                personagem.dados.valorDefesa += 5;
-                break;
-            case AMULETO_VIDA:
-                personagem.dados.hp += 20;
-                break;
-        }
-    }
-}
- 
-void verificaColisaoAmuletos() {
-    float x = personagem.posicao.x;
-    float y = personagem.posicao.y;
-    float w = (float)personagem.largura;
-    float h = (float)personagem.altura;
-    
-    // Verifica colisão com amuletos no mapa
-    int col = (int)((x + w / 2) / bloco.largura);
-    int lin = (int)((y + h / 2) / bloco.altura);
-    
-    if (lin >= 0 && lin < map.linhas && col >= 0 && col < map.colunas) {
-        char c = map.matrizMapa[lin][col];
-        
-        if (c == 'A') {
-            // Determina qual amuleto baseado na posição (você pode melhorar isso depois)
-            TipoAmuleto tipo = (TipoAmuleto)(personagem.dados.amuletosColetados % TOTAL_AMULETOS);
-            coletaAmuleto(tipo);
-            
-            // Remove o amuleto do mapa
-            map.matrizMapa[lin][col] = ' ';
-        }
-    }
-}
-void coletaHabilidade() {
-    if (personagem.dados.habilidadesColetadas < 3) {
-        personagem.dados.habilidadesColetadas++;
-    }
-}
-
-void verificaColisaoHabilidades() {
-    float x = personagem.posicao.x;
-    float y = personagem.posicao.y;
-    float w = (float)personagem.largura;
-    float h = (float)personagem.altura;
-    
-    int col = (int)((x + w / 2) / bloco.largura);
-    int lin = (int)((y + h / 2) / bloco.altura);
-    
-    if (lin >= 0 && lin < map.linhas && col >= 0 && col < map.colunas) {
-        char c = map.matrizMapa[lin][col];
-        
-        if (c == 'H') {
-            coletaHabilidade();
-            map.matrizMapa[lin][col] = ' ';
-        }
-    }
-}
-
-void disparaHabilidade() {
-    if (IsKeyPressed(KEY_Z) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= 20) {
-        personagem.dados.mp -= 20;
-        personagem.dados.habilidadesColetadas--;
-        
-        personagem.dados.habilidadeAtiva.ativo = true;
-        personagem.dados.habilidadeAtiva.posicao = personagem.posicao;
-        personagem.dados.habilidadeAtiva.velocidade = 8.0f;
-        personagem.dados.habilidadeAtiva.direcao = personagem.olhandoDireita;
-    }
-}
-
-
-
-// Variável local para controlar quanto tempo o boneco fica rosa atacando
-static float tempoAtaque = 0.0f;
-
 void updatePersonagem() {
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) personagem.olhandoDireita = true;
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))  personagem.olhandoDireita = false;
 
-    // --- SISTEMA DE ATIVAÇÃO DO ATAQUE ---
-    // Ativa o ataque ao pressionar o botão esquerdo do mouse ou a tecla J
     if (IsKeyPressed(KEY_X) && !personagem.dados.ataque) {
         personagem.dados.ataque = true;
-        tempoAtaque = 0.2f; // O ataque dura 0.2 segundos (cerca de 12 frames a 60fps)
+        tempoAtaque = 0.2f;
     }
 
-    // Gerencia o tempo do ataque
     if (personagem.dados.ataque) {
         tempoAtaque -= GetFrameTime();
         if (tempoAtaque <= 0.0f) {
-            personagem.dados.ataque = false; // Fim do ataque
+            personagem.dados.ataque = false;
         }
     }
 
     personagem.posicao = movimentaPersonagem(personagem.posicao);
     verificaColisaoAmuletos();
-    verificaColisaoAmuletos();
     verificaColisaoHabilidades();
     disparaHabilidade();
-    
-    // Atualiza habilidade ativa
-    if (personagem.dados.habilidadeAtiva.ativo) {
-        float dx = personagem.dados.habilidadeAtiva.direcao ? personagem.dados.habilidadeAtiva.velocidade : -personagem.dados.habilidadeAtiva.velocidade;
-        personagem.dados.habilidadeAtiva.posicao.x += dx;
-        
-        // Remove se sair do mapa
-        if (personagem.dados.habilidadeAtiva.posicao.x < 0 || personagem.dados.habilidadeAtiva.posicao.x > map.colunas * bloco.largura) {
-            personagem.dados.habilidadeAtiva.ativo = false;
-        }
-    }
+    atualizaHabilidade();
 }
 
 void desenhaPersonagem() {
