@@ -6,6 +6,7 @@
 // Declaração do Boss como uma variável global para o jogo inteiro conhecer
 extern infoEntidade chefao;
 extern bool bossAtivo;
+extern bool bossPodeReceberDano;
 
 // Funções principais do Boss
 void loadBoss();

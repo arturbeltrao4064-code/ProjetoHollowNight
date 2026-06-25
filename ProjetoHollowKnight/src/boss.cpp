@@ -1,12 +1,25 @@
 #include "boss.h"
 #include "mapa.h"
+#include "personagem.h"
 #include <raylib.h>
 
 // Definição das variáveis globais do Boss
 infoEntidade chefao = { 0 };
 bool bossAtivo = false;
+bool bossPodeReceberDano = false;
+static float bossVelY = 0.0f;
+static float bossCountdown = 3.0f;
+static bool bossMovendo = false;
+static bool bossPreparando = false;
+static float bossJumpCooldown = 0.0f;
 
 void loadBoss() {
+    bossVelY = 0.0f;
+    bossCountdown = 3.0f;
+    bossMovendo = false;
+    bossPreparando = false;
+    bossPodeReceberDano = false;
+    bossJumpCooldown = 0.0f;
 }
 
 void unloadBoss() {
@@ -16,63 +29,119 @@ void unloadBoss() {
 Vector2 movimentaBoss(Vector2 posicaoAtual) {
     float x = posicaoAtual.x;
     float y = posicaoAtual.y;
-    float w = (float)chefao.largura;  // 60
-    float h = (float)chefao.altura;   // 60
+    float w = (float)chefao.largura;
+    float h = (float)chefao.altura;
 
-    float direcaoX = chefao.olhandoDireita ? 1.0f : -1.0f;
+    float velocidadeBoss = constantesJogo.velocidade * 0.4f; // boss bem mais lento
+    float distanciaChase = 300.0f;
+    float distanciaPulo = 200.0f;
+    float distanciaAtaque = 120.0f;
+    float diferencaX = personagem.posicao.x - x;
+    float absDiferencaX = diferencaX < 0 ? -diferencaX : diferencaX;
 
-    // --- 1. PATRULHA HORIZONTAL ---
-    x += direcaoX * (constantesJogo.velocidade + 0.5f);
+    bool jogadorEstaLonge = absDiferencaX > distanciaPulo;
+    bool jogadorEstaPerto = absDiferencaX <= distanciaAtaque;
 
-    if (x > chefao.posicaoInicial.x + 150.0f) {
-        chefao.olhandoDireita = false;
+    if (bossJumpCooldown > 0.0f) {
+        bossJumpCooldown -= GetFrameTime();
+        if (bossJumpCooldown < 0.0f) bossJumpCooldown = 0.0f;
     }
-    if (x < chefao.posicaoInicial.x - 150.0f) {
-        chefao.olhandoDireita = true;
+
+    // --- 1. PADRÃO DE ATAQUE ---
+    if (jogadorEstaLonge) {
+        if (diferencaX > 0) chefao.olhandoDireita = true;
+        else chefao.olhandoDireita = false;
+
+        // salto em direção ao jogador apenas quando estiver no chão e o cooldown terminar
+        if (bossVelY == 0.0f && bossJumpCooldown <= 0.0f) {
+            bossVelY = -11.0f;
+            bossJumpCooldown = 1.2f;
+        }
+
+        // movimento horizontal suave enquanto estiver no ar ou aguardando o salto
+        x += (diferencaX > 0 ? velocidadeBoss : -velocidadeBoss);
+    }
+    else {
+        // quando perto: ataque frontal lento (andar para frente)
+        float direcaoX = chefao.olhandoDireita ? 1.0f : -1.0f;
+        x += direcaoX * velocidadeBoss;
+
+        // ajusta a direção do boss se o jogador estiver do outro lado
+        if (diferencaX > 0) chefao.olhandoDireita = true;
+        else chefao.olhandoDireita = false;
     }
 
-    // --- 2. GRAVIDADE E DETECÇÃO DE CHÃO BLINDADA ---
+    // --- 3. GRAVIDADE E DETECÇÃO DE CHÃO ---
     float velocidadeQueda = 4.0f;
     bool pisouNoChao = false;
 
-    // Testamos pixel por pixel da queda para o Boss de 60px nunca "burlar" o chão
+    // atualiza a velocidade vertical do boss com gravidade
+    bossVelY += constantesJogo.gravidade;
+    y += bossVelY;
+
     for (int i = 1; i <= (int)velocidadeQueda; i++) {
         float testeY = y + i;
 
         bool colideEsq = blocoSolido(x + 4,       testeY + h);
-        bool colideMid = blocoSolido(x + (w / 2), testeY + h); 
+        bool colideMid = blocoSolido(x + (w / 2), testeY + h);
         bool colideDir = blocoSolido(x + w - 4,   testeY + h);
 
         if (colideEsq || colideMid || colideDir) {
             int lin = (int)((testeY + h) / bloco.altura);
             y = lin * bloco.altura - h - 0.1f;
             pisouNoChao = true;
-            break; // Para de cair imediatamente
+            bossVelY = 0.0f;
+            break;
         }
     }
 
-    // Se não encontrou chão nenhum no caminho, aplica a queda normal
     if (!pisouNoChao) {
-        y += velocidadeQueda;
+        // trava limitando queda, mas isso já está sendo aplicado via y += bossVelY
     }
 
-    // --- 3. TRAVA ANTILIMBO (SEGURANÇA MÁXIMA) ---
-    // Se por acaso ele passar da penúltima linha do mapa, força ele a voltar para a posição inicial
-    float limiteInferiorMapa = (map.linhas - 2) * bloco.altura; 
+    // --- 4. TRAVA ANTILIMBO ---
+    float limiteInferiorMapa = (map.linhas - 2) * bloco.altura;
     if (y > limiteInferiorMapa) {
         x = chefao.posicaoInicial.x;
-        y = chefao.posicaoInicial.y - 10.0f; // Nasce um pouco acima para cair direito
+        y = chefao.posicaoInicial.y - 10.0f;
     }
 
-    // Retorna a posição corrigida
-    Vector2 novaPosicao;
-    novaPosicao.x = x;
-    novaPosicao.y = y;
-    return novaPosicao;
+    return (Vector2){ x, y };
+}
+
+static void atualizaAtivacaoBoss() {
+    if (bossMovendo || bossPreparando) return;
+
+    float distanciaInicio = 260.0f;
+    float diferencaX = personagem.posicao.x - chefao.posicaoInicial.x;
+    float absDiferencaX = diferencaX < 0 ? -diferencaX : diferencaX;
+    float diferencaY = personagem.posicao.y - chefao.posicaoInicial.y;
+    float absDiferencaY = diferencaY < 0 ? -diferencaY : diferencaY;
+
+    if (absDiferencaX <= distanciaInicio && absDiferencaY <= 200.0f) {
+        bossPreparando = true;
+        bossCountdown = 3.0f;
+    }
 }
 
 void updateBoss() {
-    if (bossAtivo && chefao.dados.vivo) {
+    if (!bossAtivo || !chefao.dados.vivo) return;
+
+    if (!bossMovendo) {
+        if (!bossPreparando) {
+            atualizaAtivacaoBoss();
+        }
+        else {
+            bossCountdown -= GetFrameTime();
+            if (bossCountdown <= 0.0f) {
+                bossPreparando = false;
+                bossMovendo = true;
+                bossPodeReceberDano = true;
+            }
+        }
+    }
+
+    if (bossMovendo) {
         chefao.posicao = movimentaBoss(chefao.posicao);
     }
 }

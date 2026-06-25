@@ -198,6 +198,18 @@ void updateJogo() {
         }
     }
 
+    if (bossAtivo && chefao.dados.vivo && bossPodeReceberDano && personagem.dados.ataque) {
+        Rectangle rectBoss = { chefao.posicao.x, chefao.posicao.y, (float)chefao.largura, (float)chefao.altura };
+        if (CheckCollisionRecs(rectAtaque, rectBoss)) {
+            chefao.dados.hp -= personagem.dados.valorAtaque;
+            personagem.dados.ataque = false;
+            if (chefao.dados.hp <= 0) {
+                chefao.dados.hp = 0;
+                chefao.dados.vivo = false;
+            }
+        }
+    }
+
     // --- ATUALIZAÇÃO DA CÂMERA ---
     tela.camera.target = {
         personagem.posicao.x + personagem.largura / 2.0f,

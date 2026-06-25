@@ -2,6 +2,8 @@
 #include "mapa.h"
 #include <raylib.h>
 
+static int tempoMudancaDirecao[MAX_INIMIGOS] = { 0 };
+
 void loadInimigo() {
     // Carrega as texturas normalmente
     listaInimigos[0].imagem[0] = LoadTexture("Texturas/Inimigo/Inimigo.png");
@@ -19,20 +21,30 @@ Vector2 movimentaInimigoEspecifico(int indice, Vector2 posicaoAtual) {
     float w = (float)listaInimigos[indice].largura;
     float h = (float)listaInimigos[indice].altura;
 
-    // Determina a direção baseada no booleano individual de cada inimigo
+    if (tempoMudancaDirecao[indice] <= 0) {
+        int novaDirecao = GetRandomValue(0, 1);
+        listaInimigos[indice].olhandoDireita = (novaDirecao == 1);
+        tempoMudancaDirecao[indice] = GetRandomValue(30, 90); // troca direção a cada 0.5 a 1.5 segundos
+    }
+
     float direcaoX = listaInimigos[indice].olhandoDireita ? 1.0f : -1.0f;
-
-    // --- 1. PATRULHA HORIZONAL POR RAIO DE DISTÂNCIA ---
-    // Faz o inimigo andar usando a velocidade do jogo (ex: 3.0f)
     x += direcaoX * constantesJogo.velocidade;
+    tempoMudancaDirecao[indice]--;
 
-    // Se ele se afastar mais de 90 pixels para a direita da sua posição original, vira para a esquerda
+    // Se bater em um limite de 90 pixels do ponto inicial, muda de direção para não fugir demais
     if (x > listaInimigos[indice].posicaoInicial.x + 90.0f) {
         listaInimigos[indice].olhandoDireita = false;
     }
-    // Se ele se afastar mais de 90 pixels para a esquerda da sua posição original, vira para a direita
     if (x < listaInimigos[indice].posicaoInicial.x - 90.0f) {
         listaInimigos[indice].olhandoDireita = true;
+    }
+
+    // Se bater em uma parede, inverte a direção imediatamente
+    float frenteX = listaInimigos[indice].olhandoDireita ? x + w : x;
+    float pontoY = y + h / 2;
+    if (blocoSolido(frenteX, pontoY)) {
+        listaInimigos[indice].olhandoDireita = !listaInimigos[indice].olhandoDireita;
+        x -= direcaoX * constantesJogo.velocidade; // desfaz o último movimento
     }
 
     // --- 2. GRAVIDADE SIMPLIFICADA E SEGURA ---
