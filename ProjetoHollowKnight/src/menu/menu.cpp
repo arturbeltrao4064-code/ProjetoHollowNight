@@ -13,13 +13,13 @@ static int opcaoMorteSelecionada = 0;
 static const bool MORTE_DESABILITADA_TESTE = true;
 
 static void updateFim() {
-    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         estadoAtual = ESTADO_MENU;
     }
 }
 
 static void updateAjuda() {
-    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         estadoAtual = ESTADO_MENU;
     }
 }
@@ -48,6 +48,17 @@ static void iniciarNovoJogo() {
 }
 
 static void updateMorte() {
+    Vector2 mouse = GetMousePosition();
+    Rectangle botaoReiniciar = { (float)tela.largura / 2 - 160.0f, 340.0f, 320.0f, 52.0f };
+    Rectangle botaoMenu = { (float)tela.largura / 2 - 160.0f, 410.0f, 320.0f, 52.0f };
+
+    if (CheckCollisionPointRec(mouse, botaoReiniciar)) {
+        opcaoMorteSelecionada = 0;
+    }
+    if (CheckCollisionPointRec(mouse, botaoMenu)) {
+        opcaoMorteSelecionada = 1;
+    }
+
     if (IsKeyPressed(KEY_DOWN)) {
         opcaoMorteSelecionada = (opcaoMorteSelecionada + 1) % 2;
     }
@@ -55,7 +66,7 @@ static void updateMorte() {
         opcaoMorteSelecionada = (opcaoMorteSelecionada - 1 + 2) % 2;
     }
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         if (opcaoMorteSelecionada == 0) {
             iniciarNovoJogo();
         } else {

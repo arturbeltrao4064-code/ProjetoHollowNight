@@ -63,6 +63,7 @@ void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabil
 void desenhaInventario() {
     static int slotInventario = 0;
     bool podeAlterarAmuleto = (faseDoJogo == FASE_VILA);
+    Vector2 mouse = GetMousePosition();
 
     drawJogo();
     DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 160});
@@ -98,6 +99,9 @@ void desenhaInventario() {
 
     for (int i = 0; i < TOTAL_AMULETOS; i++) {
         Rectangle slot = { (float)(startX + i * espacamentoX), (float)startY, 150, 160 };
+        if (CheckCollisionPointRec(mouse, slot)) {
+            slotInventario = i;
+        }
         bool selecionado = (i == slotInventario);
         bool equipado    = (personagem.dados.amuletaEquipado == i);
 
@@ -121,6 +125,9 @@ void desenhaInventario() {
     }
 
     DrawText("ESC = voltar", invX + 30, invY + invAltura - 35, 15, LIGHTGRAY);
+    if (podeAlterarAmuleto && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && personagem.dados.amuletos[slotInventario].coletado) {
+        equipaAmuleto(slotInventario);
+    }
     if (IsKeyPressed(KEY_ESCAPE)) {
         estadoAtual = ESTADO_PAUSADO;
     }

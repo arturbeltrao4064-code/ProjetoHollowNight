@@ -7,12 +7,24 @@
 #include <cstdlib>
 
 void updateMenuPrincipal() {
+    Vector2 mouse = GetMousePosition();
+    bool cliqueMouse = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    float x = tela.largura / 2.0f - menuPrincipal.botaoW / 2.0f;
+    for (int i = 0; i < menuPrincipal.totalOpcoes; i++) {
+        float y = menuPrincipal.botoesY[i] - menuPrincipal.botaoH / 2.0f;
+        Rectangle botao = { x, y, (float)menuPrincipal.botaoW, (float)menuPrincipal.botaoH };
+        if (CheckCollisionPointRec(mouse, botao)) {
+            menuPrincipal.opcaoSelecionada = i;
+        }
+    }
+
     if (IsKeyPressed(KEY_DOWN))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada + 1) % menuPrincipal.totalOpcoes;
     if (IsKeyPressed(KEY_UP))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada - 1 + menuPrincipal.totalOpcoes) % menuPrincipal.totalOpcoes;
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_ENTER) || cliqueMouse) {
         switch (menuPrincipal.opcaoSelecionada) {
             case 0:
                 personagem.dados.hp = 5;
@@ -64,6 +76,18 @@ void updateMenuPrincipal() {
 }
 
 void updatePause() {
+    Vector2 mouse = GetMousePosition();
+    bool cliqueMouse = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    float x = tela.largura / 2.0f - menuPause.botaoW / 2.0f;
+    for (int i = 0; i < menuPause.totalOpcoes; i++) {
+        float y = menuPause.botoesY[i] - menuPause.botaoH / 2.0f;
+        Rectangle botao = { x, y, (float)menuPause.botaoW, (float)menuPause.botaoH };
+        if (CheckCollisionPointRec(mouse, botao)) {
+            menuPause.opcaoSelecionada = i;
+        }
+    }
+
     if (IsKeyPressed(KEY_DOWN))
         menuPause.opcaoSelecionada = (menuPause.opcaoSelecionada + 1) % menuPause.totalOpcoes;
     if (IsKeyPressed(KEY_UP))
@@ -77,7 +101,7 @@ void updatePause() {
         return;
     }
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_ENTER) || cliqueMouse) {
         switch (menuPause.opcaoSelecionada) {
             case 0: estadoAtual = ESTADO_JOGANDO; break;
             case 1: estadoAtual = ESTADO_INVENTARIO; break;
@@ -89,11 +113,26 @@ void updatePause() {
 }
 
 void updateConfiguracoes() {
+    Vector2 mouse = GetMousePosition();
+    bool cliqueMouse = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    for (int i = 0; i < menuConfiguracoes.totalOpcoes; i++) {
+        Rectangle item = {
+            (float)(tela.largura / 2 - 140),
+            (float)(menuConfiguracoes.botoesY[i] - 20),
+            280.0f,
+            40.0f
+        };
+        if (CheckCollisionPointRec(mouse, item)) {
+            menuConfiguracoes.opcaoSelecionada = i;
+        }
+    }
+
     if (IsKeyPressed(KEY_DOWN))
         menuConfiguracoes.opcaoSelecionada = (menuConfiguracoes.opcaoSelecionada + 1) % menuConfiguracoes.totalOpcoes;
     if (IsKeyPressed(KEY_UP))
         menuConfiguracoes.opcaoSelecionada = (menuConfiguracoes.opcaoSelecionada - 1 + menuConfiguracoes.totalOpcoes) % menuConfiguracoes.totalOpcoes;
-    if (IsKeyPressed(KEY_ENTER) && menuConfiguracoes.opcaoSelecionada == menuConfiguracoes.totalOpcoes - 1)
+    if ((IsKeyPressed(KEY_ENTER) || cliqueMouse) && menuConfiguracoes.opcaoSelecionada == menuConfiguracoes.totalOpcoes - 1)
         estadoAtual = ESTADO_MENU;
     if (IsKeyPressed(KEY_ESCAPE))
         estadoAtual = ESTADO_MENU;
