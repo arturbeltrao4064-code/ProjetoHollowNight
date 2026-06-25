@@ -40,7 +40,7 @@ void desenhaMapa() {
             float posY = i * bloco.altura;
 
             if (c == 'P') {
-                bool paredeSaida = (faseDoJogo != FASE_VILA) && (j <= 1);
+                bool paredeSaida = (j >= map.colunas - 2);
                 DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura,
                               paredeSaida ? (Color){180, 40, 40, 255} : BLACK);
             }

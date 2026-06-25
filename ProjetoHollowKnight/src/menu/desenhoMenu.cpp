@@ -62,6 +62,7 @@ void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabil
 
 void desenhaInventario() {
     static int slotInventario = 0;
+    bool podeAlterarAmuleto = (faseDoJogo == FASE_VILA);
 
     drawJogo();
     DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 160});
@@ -75,13 +76,16 @@ void desenhaInventario() {
     DrawText("INVENTARIO DE AMULETOS", invX + 30, invY + 20, 26, YELLOW);
     DrawText("Use SETAS para navegar, ENTER para equipar", invX + 30, invY + 55, 14, LIGHTGRAY);
     DrawText("(Apenas um amuleto pode ser equipado por vez)", invX + 30, invY + 75, 13, GRAY);
+    if (!podeAlterarAmuleto) {
+        DrawText("Equipar/desequipar so e permitido na vila", invX + 30, invY + 95, 14, ORANGE);
+    }
 
     // Navegacao
     if (IsKeyPressed(KEY_RIGHT))
         slotInventario = (slotInventario + 1) % TOTAL_AMULETOS;
     if (IsKeyPressed(KEY_LEFT))
         slotInventario = (slotInventario - 1 + TOTAL_AMULETOS) % TOTAL_AMULETOS;
-    if (IsKeyPressed(KEY_ENTER) && personagem.dados.amuletos[slotInventario].coletado)
+    if (podeAlterarAmuleto && IsKeyPressed(KEY_ENTER) && personagem.dados.amuletos[slotInventario].coletado)
         equipaAmuleto(slotInventario);
 
     const char* nomes[TOTAL_AMULETOS]   = {"ATAQUE", "VELOCIDADE", "VIDA"};

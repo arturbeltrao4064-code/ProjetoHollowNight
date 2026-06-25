@@ -10,8 +10,15 @@
 
 Estado estadoAtual = ESTADO_MENU;
 static int opcaoMorteSelecionada = 0;
+static const bool MORTE_DESABILITADA_TESTE = true;
 
 static void updateFim() {
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+        estadoAtual = ESTADO_MENU;
+    }
+}
+
+static void updateAjuda() {
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
         estadoAtual = ESTADO_MENU;
     }
@@ -64,9 +71,12 @@ void desenhaMenu() {
         updateMenuPrincipal();
     else if (estadoAtual == ESTADO_JOGANDO) {
         updateJogo();
-        if (!personagem.dados.vivo || personagem.dados.hp <= 0) {
+        if (!MORTE_DESABILITADA_TESTE && (!personagem.dados.vivo || personagem.dados.hp <= 0)) {
             estadoAtual = ESTADO_MORTE;
             opcaoMorteSelecionada = 0;
+        }
+        if (IsKeyPressed(KEY_TAB)) {
+            estadoAtual = ESTADO_INVENTARIO;
         }
         if (IsKeyPressed(KEY_ESCAPE)) {
             estadoAtual = ESTADO_PAUSADO;
@@ -85,6 +95,9 @@ void desenhaMenu() {
     }
     else if (estadoAtual == ESTADO_FIM) {
         updateFim();
+    }
+    else if (estadoAtual == ESTADO_AJUDA) {
+        updateAjuda();
     }
 
     // DRAW
@@ -187,6 +200,40 @@ void desenhaMenu() {
         DrawText(info,
             tela.largura / 2 - MeasureText(info, 22) / 2,
             410, 22, LIGHTGRAY);
+    }
+    else if (estadoAtual == ESTADO_AJUDA) {
+        DrawRectangle(0, 0, tela.largura, tela.altura, (Color){18, 18, 24, 255});
+
+        const char* titulo = "AJUDA";
+        DrawText(titulo,
+            tela.largura / 2 - MeasureText(titulo, 56) / 2,
+            40, 56, YELLOW);
+
+        int x = 90;
+        int y = 130;
+        int lh = 30;
+
+        DrawText("CONTROLES", x, y, 30, GOLD); y += lh + 12;
+        DrawText("SETAS: mover personagem e navegar menus", x, y, 22, RAYWHITE); y += lh;
+        DrawText("X: ataque corpo a corpo", x, y, 22, RAYWHITE); y += lh;
+        DrawText("D: habilidade (disparo)", x, y, 22, RAYWHITE); y += lh;
+        DrawText("A (segurar): canalizar cura com flask", x, y, 22, RAYWHITE); y += lh;
+        DrawText("ESC: pause / voltar", x, y, 22, RAYWHITE); y += lh;
+        DrawText("TAB: abrir inventario", x, y, 22, RAYWHITE); y += lh + 14;
+
+        DrawText("AMULETOS", x, y, 30, GOLD); y += lh + 12;
+        DrawText("1 ATAQUE: aumenta o dano por hit", x, y, 22, RAYWHITE); y += lh;
+        DrawText("2 VELOCIDADE: acelera movimento", x, y, 22, RAYWHITE); y += lh;
+        DrawText("3 VIDA: adiciona +1 vida maxima", x, y, 22, RAYWHITE); y += lh;
+        DrawText("Apenas 1 amuleto equipado por vez", x, y, 22, RAYWHITE); y += lh;
+        DrawText("Equipar/desequipar apenas na vila", x, y, 22, RAYWHITE); y += lh + 14;
+
+        DrawText("INIMIGOS E BOSS", x, y, 30, GOLD); y += lh + 12;
+        DrawText("Inimigos comuns: aproximam e causam dano por contato", x, y, 22, RAYWHITE); y += lh;
+        DrawText("Boss: ativa quando o jogador se aproxima, pula e persegue", x, y, 22, RAYWHITE); y += lh;
+        DrawText("Boss causa dano e knockback, mantenha distancia e ataque no timing", x, y, 22, RAYWHITE); y += lh + 18;
+
+        DrawText("ENTER ou ESC para voltar ao menu", x, y, 24, LIGHTGRAY);
     }
 
     EndDrawing();

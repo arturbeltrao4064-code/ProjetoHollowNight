@@ -53,6 +53,7 @@ void updateMenuPrincipal() {
                 estadoAtual = ESTADO_CONFIGURACOES;
                 break;
             case 3:
+                estadoAtual = ESTADO_AJUDA;
                 break;
             case 4:
                 CloseWindow();
@@ -70,6 +71,11 @@ void updatePause() {
 
     if (IsKeyPressed(KEY_ESCAPE))
         estadoAtual = ESTADO_JOGANDO;
+
+    if (IsKeyPressed(KEY_TAB)) {
+        estadoAtual = ESTADO_INVENTARIO;
+        return;
+    }
 
     if (IsKeyPressed(KEY_ENTER)) {
         switch (menuPause.opcaoSelecionada) {

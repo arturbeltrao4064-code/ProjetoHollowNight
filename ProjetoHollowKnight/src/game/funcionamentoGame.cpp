@@ -51,7 +51,6 @@ static void trocarMapa(const char* novoMapa) {
 static void gerenciarTransicaoFases() {
     float mapaLargura = map.colunas * bloco.largura;
     bool chegouDireita = (personagem.posicao.x + personagem.largura) >= (mapaLargura - 45.0f);
-    bool chegouEsquerda = personagem.posicao.x <= 5.0f;
 
     if (faseDoJogo == FASE_VILA && chegouDireita) {
         if (proximoTunel == 1) {
@@ -67,21 +66,21 @@ static void gerenciarTransicaoFases() {
         return;
     }
 
-    if (faseDoJogo == FASE_INICIAL && chegouEsquerda) {
+    if (faseDoJogo == FASE_INICIAL && chegouDireita) {
         if (proximoTunel < 2) proximoTunel = 2;
         faseDoJogo = FASE_VILA;
         trocarMapa("maps/vila.txt");
         return;
     }
 
-    if (faseDoJogo == FASE_FINAL && chegouEsquerda) {
+    if (faseDoJogo == FASE_FINAL && chegouDireita) {
         if (proximoTunel < 3) proximoTunel = 3;
         faseDoJogo = FASE_VILA;
         trocarMapa("maps/vila.txt");
         return;
     }
 
-    if (faseDoJogo == FASE_TUNEL3 && chegouEsquerda) {
+    if (faseDoJogo == FASE_TUNEL3 && chegouDireita) {
         proximoTunel = 4;
         faseDoJogo = FASE_VILA;
         trocarMapa("maps/vila.txt");
