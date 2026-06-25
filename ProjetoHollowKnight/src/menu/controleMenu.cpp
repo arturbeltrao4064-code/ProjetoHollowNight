@@ -2,20 +2,24 @@
 #include "game.h"
 #include "mapa.h"
 #include "save.h"
+#include "personagem.h"
 #include <raylib.h>
 #include <cstdlib>
 
 void updateMenuPrincipal() {
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+    if (IsKeyPressed(KEY_DOWN))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada + 1) % menuPrincipal.totalOpcoes;
-    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    if (IsKeyPressed(KEY_UP))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada - 1 + menuPrincipal.totalOpcoes) % menuPrincipal.totalOpcoes;
 
     if (IsKeyPressed(KEY_ENTER)) {
         switch (menuPrincipal.opcaoSelecionada) {
             case 0:
-                personagem.dados.hp = 100;
-                personagem.dados.mp = 50;
+                personagem.dados.hp = 5;
+                personagem.dados.hpMax = 5;
+                personagem.dados.mp = 100;
+                flaskCarga = 100.0f;
+                personagem.dados.flask = 100;
                 personagem.dados.habilidadesColetadas = 0;
                 personagem.dados.amuletosColetados = 0;
                 for (int i = 0; i < TOTAL_AMULETOS; i++) {
@@ -57,9 +61,9 @@ void updateMenuPrincipal() {
 }
 
 void updatePause() {
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+    if (IsKeyPressed(KEY_DOWN))
         menuPause.opcaoSelecionada = (menuPause.opcaoSelecionada + 1) % menuPause.totalOpcoes;
-    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    if (IsKeyPressed(KEY_UP))
         menuPause.opcaoSelecionada = (menuPause.opcaoSelecionada - 1 + menuPause.totalOpcoes) % menuPause.totalOpcoes;
 
     if (IsKeyPressed(KEY_ESCAPE))
@@ -77,9 +81,9 @@ void updatePause() {
 }
 
 void updateConfiguracoes() {
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+    if (IsKeyPressed(KEY_DOWN))
         menuConfiguracoes.opcaoSelecionada = (menuConfiguracoes.opcaoSelecionada + 1) % menuConfiguracoes.totalOpcoes;
-    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    if (IsKeyPressed(KEY_UP))
         menuConfiguracoes.opcaoSelecionada = (menuConfiguracoes.opcaoSelecionada - 1 + menuConfiguracoes.totalOpcoes) % menuConfiguracoes.totalOpcoes;
     if (IsKeyPressed(KEY_ENTER) && menuConfiguracoes.opcaoSelecionada == menuConfiguracoes.totalOpcoes - 1)
         estadoAtual = ESTADO_MENU;

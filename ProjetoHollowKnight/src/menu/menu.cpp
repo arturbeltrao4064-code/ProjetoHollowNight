@@ -9,6 +9,47 @@
 #include <cstdlib>
 
 Estado estadoAtual = ESTADO_MENU;
+static int opcaoMorteSelecionada = 0;
+
+static void iniciarNovoJogo() {
+    personagem.dados.hp = 5;
+    personagem.dados.hpMax = 5;
+    personagem.dados.mp = 100;
+    flaskCarga = 100.0f;
+    personagem.dados.flask = 100;
+    personagem.dados.habilidadesColetadas = 0;
+    personagem.dados.amuletosColetados = 0;
+    for (int i = 0; i < TOTAL_AMULETOS; i++) {
+        personagem.dados.amuletos[i].coletado = false;
+    }
+    personagem.dados.ataque = false;
+    personagem.dados.vivo = true;
+    personagem.dados.habilidadeAtiva.ativo = false;
+    faseDoJogo = FASE_VILA;
+    unloadMapa();
+    map.localMapa = "maps/mapaVila.txt";
+    loadMapa();
+    inicializaPosicoesEntidades();
+    estadoAtual = ESTADO_JOGANDO;
+}
+
+static void updateMorte() {
+    if (IsKeyPressed(KEY_DOWN)) {
+        opcaoMorteSelecionada = (opcaoMorteSelecionada + 1) % 2;
+    }
+    if (IsKeyPressed(KEY_UP)) {
+        opcaoMorteSelecionada = (opcaoMorteSelecionada - 1 + 2) % 2;
+    }
+
+    if (IsKeyPressed(KEY_ENTER)) {
+        if (opcaoMorteSelecionada == 0) {
+            iniciarNovoJogo();
+        } else {
+            estadoAtual = ESTADO_MENU;
+            opcaoMorteSelecionada = 0;
+        }
+    }
+}
 
 void desenhaMenu() {
     // UPDATE
@@ -16,6 +57,10 @@ void desenhaMenu() {
         updateMenuPrincipal();
     else if (estadoAtual == ESTADO_JOGANDO) {
         updateJogo();
+        if (!personagem.dados.vivo || personagem.dados.hp <= 0) {
+            estadoAtual = ESTADO_MORTE;
+            opcaoMorteSelecionada = 0;
+        }
         if (IsKeyPressed(KEY_ESCAPE)) {
             estadoAtual = ESTADO_PAUSADO;
             menuPause.opcaoSelecionada = 0;
@@ -27,6 +72,9 @@ void desenhaMenu() {
         updateConfiguracoes();
     else if (estadoAtual == ESTADO_INVENTARIO) {
         desenhaInventario();
+    }
+    else if (estadoAtual == ESTADO_MORTE) {
+        updateMorte();
     }
 
     // DRAW
@@ -40,8 +88,8 @@ void desenhaMenu() {
         desenhaBotao(2, 2, menuPrincipal.opcaoSelecionada, false);
         desenhaBotao(5, 3, menuPrincipal.opcaoSelecionada, false);
         desenhaBotao(3, 4, menuPrincipal.opcaoSelecionada, false);
-        DrawText("W/S = Navegar | ENTER = Selecionar",
-            tela.largura / 2 - MeasureText("W/S = Navegar | ENTER = Selecionar", 16) / 2,
+        DrawText("SETAS = Navegar | ENTER = Selecionar",
+            tela.largura / 2 - MeasureText("SETAS = Navegar | ENTER = Selecionar", 16) / 2,
             tela.altura - 30, 16, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
@@ -59,7 +107,7 @@ void desenhaMenu() {
         desenhaBotaoPause(2, 2, menuPause.opcaoSelecionada, false);
         desenhaBotaoPause(3, 3, menuPause.opcaoSelecionada, false);
         desenhaBotaoPause(4, 4, menuPause.opcaoSelecionada, false);
-        const char* hint = "W/S = Navegar | ENTER = Selecionar | ESC = Continuar";
+        const char* hint = "SETAS = Navegar | ENTER = Selecionar | ESC = Continuar";
         DrawText(hint, tela.largura / 2 - MeasureText(hint, 14) / 2, tela.altura - 30, 14, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_CONFIGURACOES) {
@@ -76,6 +124,42 @@ void desenhaMenu() {
         DrawText("ESC = Voltar",
             tela.largura / 2 - MeasureText("ESC = Voltar", 16) / 2,
             tela.altura - 30, 16, DARKGRAY);
+    }
+    else if (estadoAtual == ESTADO_MORTE) {
+        drawJogo();
+        DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 170});
+
+        const char* titulo = "VOCE MORREU";
+        DrawText(titulo,
+            tela.largura / 2 - MeasureText(titulo, 54) / 2,
+            170, 54, RED);
+
+        const char* pergunta = "Deseja comecar novamente?";
+        DrawText(pergunta,
+            tela.largura / 2 - MeasureText(pergunta, 28) / 2,
+            250, 28, RAYWHITE);
+
+        Rectangle botaoReiniciar = { (float)tela.largura / 2 - 160.0f, 340.0f, 320.0f, 52.0f };
+        Rectangle botaoMenu = { (float)tela.largura / 2 - 160.0f, 410.0f, 320.0f, 52.0f };
+
+        DrawRectangleRec(botaoReiniciar, opcaoMorteSelecionada == 0 ? LIGHTGRAY : GRAY);
+        DrawRectangleRec(botaoMenu, opcaoMorteSelecionada == 1 ? LIGHTGRAY : GRAY);
+        DrawRectangleLinesEx(botaoReiniciar, 2, BLACK);
+        DrawRectangleLinesEx(botaoMenu, 2, BLACK);
+
+        const char* op0 = "REINICIAR";
+        const char* op1 = "VOLTAR AO MENU";
+        DrawText(op0,
+            (int)(botaoReiniciar.x + botaoReiniciar.width / 2 - MeasureText(op0, 24) / 2),
+            (int)(botaoReiniciar.y + 14), 24, BLACK);
+        DrawText(op1,
+            (int)(botaoMenu.x + botaoMenu.width / 2 - MeasureText(op1, 24) / 2),
+            (int)(botaoMenu.y + 14), 24, BLACK);
+
+        const char* hint = "SETAS = Navegar | ENTER = Selecionar";
+        DrawText(hint,
+            tela.largura / 2 - MeasureText(hint, 16) / 2,
+            tela.altura - 40, 16, LIGHTGRAY);
     }
 
     EndDrawing();

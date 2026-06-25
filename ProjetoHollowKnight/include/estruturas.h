@@ -3,8 +3,9 @@
 #include <raylib.h>
 #define QT_BOTOES_MAX 5 // Tamanho do inventário (5x5)
 #define MAX_INIMIGOS 10 // Limite máximo de inimigos que o mapa pode ter
+#define PERSONAGEM_MAX_HITS 4
 
-enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES, ESTADO_INVENTARIO };
+enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES, ESTADO_INVENTARIO, ESTADO_MORTE };
 
 typedef enum {
     AMULETO_ATAQUE,
@@ -61,15 +62,18 @@ typedef struct {
 
 typedef struct {
     int hp;
+    int hpMax;
     int mp;
+    int flask;
     int valorAtaque;
     int valorDefesa;
     bool ataque;
     bool vivo;
     int amuletosColetados;
+    int amuletaEquipado;  // -1 = nenhum, 0=ataque, 1=velocidade, 2=vida
     Amuleto amuletos[TOTAL_AMULETOS];
-    int habilidadesColetadas;  // ← ADICIONA
-    Habilidade habilidadeAtiva; // ← ADICIONA
+    int habilidadesColetadas;
+    Habilidade habilidadeAtiva;
 } dadosEntidade;
 
 typedef struct {

@@ -14,6 +14,12 @@ void inicializaPosicoesEntidades() {
 
     quantidadeInimigos = 0;
 
+    // Reseta estado do boss antes de ler o mapa; ele so deve existir se houver 'C'.
+    bossAtivo = false;
+    bossPodeReceberDano = false;
+    chefao.dados.vivo = false;
+    chefao.dados.hp = 0;
+
     for (int i = 0; i < map.linhas; i++) {
         for (int j = 0; j < map.colunas; j++) {
             char c = map.matrizMapa[i][j];
@@ -23,6 +29,8 @@ void inicializaPosicoesEntidades() {
             if (c == 'J') {
                 personagem.posicao = (Vector2){ posX, posY };
                 personagem.posicaoInicial = (Vector2){ posX, posY };
+                // Inicia cada fase com flask cheio.
+                personagem.dados.flask = 100;
             }
             else if (c == 'M') {
                 if (quantidadeInimigos < MAX_INIMIGOS) {
@@ -31,7 +39,8 @@ void inicializaPosicoesEntidades() {
                     listaInimigos[quantidadeInimigos].largura = 30;
                     listaInimigos[quantidadeInimigos].altura = 30;
                     listaInimigos[quantidadeInimigos].olhandoDireita = true;
-                    listaInimigos[quantidadeInimigos].dados.hp = 100;
+                    // Sistema por hits: cada inimigo aguenta 3 acertos.
+                    listaInimigos[quantidadeInimigos].dados.hp = 3;
                     listaInimigos[quantidadeInimigos].dados.mp = 0;
                     listaInimigos[quantidadeInimigos].dados.vivo = true;
 

@@ -9,8 +9,8 @@ Vector2 movimentaPersonagem(Vector2 posicaoAtual) {
     float h = (float)personagem.altura;
 
     float dx = 0;
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) dx = constantesJogo.velocidade;
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))  dx = -constantesJogo.velocidade;
+    if (IsKeyDown(KEY_RIGHT)) dx = constantesJogo.velocidade;
+    if (IsKeyDown(KEY_LEFT))  dx = -constantesJogo.velocidade;
 
     if (dx != 0) {
         x += dx;
@@ -58,7 +58,7 @@ Vector2 movimentaPersonagem(Vector2 posicaoAtual) {
     bool noChaoDir = blocoSolido(x + w - 2, y + h + 1);
     bool noChao    = noChaoEsq || noChaoDir;
 
-    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE)) && noChao) {
+    if (IsKeyPressed(KEY_UP) && noChao) {
         constantesJogo.velocidadeY = constantesJogo.forcaPulo;
     }
     return (Vector2){ x, y };

@@ -61,60 +61,62 @@ void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabil
 }
 
 void desenhaInventario() {
+    static int slotInventario = 0;
+
     drawJogo();
-    DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 150});
-    int invLargura = 700;
-    int invAltura = 450;
+    DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 160});
+
+    int invLargura = 720;
+    int invAltura = 470;
     int invX = tela.largura / 2 - invLargura / 2;
     int invY = tela.altura / 2 - invAltura / 2;
     DrawRectangle(invX, invY, invLargura, invAltura, DARKGRAY);
     DrawRectangleLines(invX, invY, invLargura, invAltura, WHITE);
-    DrawText("INVENTARIO DE AMULETOS", invX + 30, invY + 30, 28, YELLOW);
-    DrawText("Amuletos Coletados: ", invX + 30, invY + 70, 18, WHITE);
+    DrawText("INVENTARIO DE AMULETOS", invX + 30, invY + 20, 26, YELLOW);
+    DrawText("Use SETAS para navegar, ENTER para equipar", invX + 30, invY + 55, 14, LIGHTGRAY);
+    DrawText("(Apenas um amuleto pode ser equipado por vez)", invX + 30, invY + 75, 13, GRAY);
 
-    char contadorText[20];
-    sprintf(contadorText, "%d", personagem.dados.amuletosColetados);
-    DrawText(contadorText, invX + 280, invY + 70, 18, YELLOW);
+    // Navegacao
+    if (IsKeyPressed(KEY_RIGHT))
+        slotInventario = (slotInventario + 1) % TOTAL_AMULETOS;
+    if (IsKeyPressed(KEY_LEFT))
+        slotInventario = (slotInventario - 1 + TOTAL_AMULETOS) % TOTAL_AMULETOS;
+    if (IsKeyPressed(KEY_ENTER) && personagem.dados.amuletos[slotInventario].coletado)
+        equipaAmuleto(slotInventario);
 
-    int startX = invX + 60;
-    int startY = invY + 130;
-    int espacamentoX = 200;
+    const char* nomes[TOTAL_AMULETOS]   = {"ATAQUE", "VELOCIDADE", "VIDA"};
+    const char* efeitos[TOTAL_AMULETOS] = {"Hit duplo (dano x2)", "+50% velocidade", "+1 vida (6 slots)"};
+    Color cores[TOTAL_AMULETOS]          = {RED, ORANGE, GREEN};
+
+    int startX = invX + 50;
+    int startY = invY + 120;
+    int espacamentoX = 210;
 
     for (int i = 0; i < TOTAL_AMULETOS; i++) {
-        Rectangle slot = { (float)(startX + (i * espacamentoX)), (float)startY, 140, 140 };
-        const char* nomeAmuleto = "";
-        const char* efeito = "";
-        Color corAmuleto = GRAY;
-
-        if (i == AMULETO_ATAQUE) {
-            nomeAmuleto = "ATAQUE";
-            efeito = "+10 ATK";
-            corAmuleto = RED;
-        } else if (i == AMULETO_DEFESA) {
-            nomeAmuleto = "DEFESA";
-            efeito = "+5 DEF";
-            corAmuleto = BLUE;
-        } else if (i == AMULETO_VIDA) {
-            nomeAmuleto = "VIDA";
-            efeito = "+20 HP";
-            corAmuleto = GREEN;
-        }
+        Rectangle slot = { (float)(startX + i * espacamentoX), (float)startY, 150, 160 };
+        bool selecionado = (i == slotInventario);
+        bool equipado    = (personagem.dados.amuletaEquipado == i);
 
         if (personagem.dados.amuletos[i].coletado) {
-            DrawRectangleRec(slot, Fade(corAmuleto, 0.4f));
-            DrawRectangleLinesEx(slot, 3, corAmuleto);
-            DrawText(nomeAmuleto, (int)(slot.x + 25), (int)(slot.y + 35), 20, WHITE);
-            DrawText(efeito, (int)(slot.x + 20), (int)(slot.y + 65), 14, YELLOW);
-            DrawText("[OK]", (int)(slot.x + 35), (int)(slot.y + 105), 14, GREEN);
+            float alfa = equipado ? 0.65f : 0.35f;
+            DrawRectangleRec(slot, Fade(cores[i], alfa));
+            DrawRectangleLinesEx(slot, selecionado ? 4 : 2, selecionado ? WHITE : cores[i]);
+            DrawText(nomes[i],   (int)(slot.x + 10), (int)(slot.y + 20), 18, WHITE);
+            DrawText(efeitos[i], (int)(slot.x + 10), (int)(slot.y + 55), 12, YELLOW);
+            if (equipado) {
+                DrawText("EQUIPADO", (int)(slot.x + 25), (int)(slot.y + 120), 16, GOLD);
+            } else {
+                DrawText("[coletado]", (int)(slot.x + 20), (int)(slot.y + 125), 13, LIGHTGRAY);
+            }
         } else {
             DrawRectangleRec(slot, Fade(BLACK, 0.7f));
-            DrawRectangleLinesEx(slot, 2, GRAY);
-            DrawText("?", (int)(slot.x + 60), (int)(slot.y + 50), 40, GRAY);
-            DrawText("[---]", (int)(slot.x + 30), (int)(slot.y + 105), 14, DARKGRAY);
+            DrawRectangleLinesEx(slot, selecionado ? 4 : 2, selecionado ? WHITE : GRAY);
+            DrawText("?", (int)(slot.x + 65), (int)(slot.y + 55), 40, GRAY);
+            DrawText("[nao coletado]", (int)(slot.x + 10), (int)(slot.y + 125), 12, DARKGRAY);
         }
     }
 
-    DrawText("Pressione ESC para voltar", invX + 30, invY + invAltura - 40, 16, LIGHTGRAY);
+    DrawText("ESC = voltar", invX + 30, invY + invAltura - 35, 15, LIGHTGRAY);
     if (IsKeyPressed(KEY_ESCAPE)) {
         estadoAtual = ESTADO_PAUSADO;
     }

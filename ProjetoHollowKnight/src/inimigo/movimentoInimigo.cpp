@@ -17,7 +17,8 @@ Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual) {
     }
 
     float direcaoX = listaInimigos[indice].olhandoDireita ? 1.0f : -1.0f;
-    x += direcaoX * constantesJogo.velocidade;
+    float velocidadeInimigo = constantesJogo.velocidade * 0.5f;
+    x += direcaoX * velocidadeInimigo;
     tempoMudancaDirecao[indice]--;
 
     if (x > listaInimigos[indice].posicaoInicial.x + 90.0f) {
@@ -31,7 +32,7 @@ Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual) {
     float pontoY = y + h / 2;
     if (blocoSolido(frenteX, pontoY)) {
         listaInimigos[indice].olhandoDireita = !listaInimigos[indice].olhandoDireita;
-        x -= direcaoX * constantesJogo.velocidade;
+        x -= direcaoX * velocidadeInimigo;
     }
 
     y += 4.0f;

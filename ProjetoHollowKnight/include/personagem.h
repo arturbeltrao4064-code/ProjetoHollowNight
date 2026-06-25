@@ -15,6 +15,10 @@ void coletaHabilidade();
 void verificaColisaoHabilidades();
 void disparaHabilidade();
 void atualizaHabilidade();
+void equipaAmuleto(int tipo);
 Vector2 movimentaPersonagem(Vector2 posicaoAtual);
+
+extern float flaskCarga;
+extern float avisoVidaCheia;
 
 #endif

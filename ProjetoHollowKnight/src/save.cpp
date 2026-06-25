@@ -12,6 +12,7 @@ void salvaJogo() {
 
     fprintf(arquivo, "%d\n", personagem.dados.hp);
     fprintf(arquivo, "%d\n", personagem.dados.mp);
+    fprintf(arquivo, "%d\n", personagem.dados.flask);
     fprintf(arquivo, "%d\n", faseDoJogo);
     fprintf(arquivo, "%d\n", personagem.dados.habilidadesColetadas);
     
@@ -29,13 +30,42 @@ void carregaJogo() {
     }
 
     fscanf(arquivo, "%d", &personagem.dados.hp);
+    if (personagem.dados.hp > 5) {
+        // Compatibilidade com saves antigos baseados em HP percentual.
+        personagem.dados.hp = 5;
+    }
+    if (personagem.dados.hp < 0) personagem.dados.hp = 0;
+
     fscanf(arquivo, "%d", &personagem.dados.mp);
-    
-    int faseCarregada;
-    fscanf(arquivo, "%d", &faseCarregada);
+    if (personagem.dados.mp < 0) personagem.dados.mp = 0;
+    if (personagem.dados.mp > 100) personagem.dados.mp = 100;
+
+    int linha3 = 0;
+    int faseCarregada = 0;
+    if (fscanf(arquivo, "%d", &linha3) != 1) {
+        linha3 = 100;
+    }
+
+    int linha4 = 0;
+    if (fscanf(arquivo, "%d", &linha4) != 1) {
+        linha4 = 0;
+    }
+
+    // Save novo: linha3=flask e linha4=fase. Save antigo: linha3=fase e linha4=habilidades.
+    if (linha3 >= 0 && linha3 <= 100 && linha4 >= 0 && linha4 <= 2) {
+        personagem.dados.flask = linha3;
+        faseCarregada = linha4;
+        fscanf(arquivo, "%d", &personagem.dados.habilidadesColetadas);
+    } else {
+        personagem.dados.flask = 100;
+        faseCarregada = linha3;
+        personagem.dados.habilidadesColetadas = linha4;
+    }
+
+    if (personagem.dados.flask < 0) personagem.dados.flask = 0;
+    if (personagem.dados.flask > 100) personagem.dados.flask = 100;
+
     faseDoJogo = (FaseAtual)faseCarregada;
-    
-    fscanf(arquivo, "%d", &personagem.dados.habilidadesColetadas);
     
     for (int i = 0; i < TOTAL_AMULETOS; i++) {
         int coletado;

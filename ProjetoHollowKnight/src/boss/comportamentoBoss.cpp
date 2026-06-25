@@ -59,9 +59,7 @@ void updateBoss() {
             Rectangle playerRect = {personagem.posicao.x, personagem.posicao.y, (float)personagem.largura, (float)personagem.altura};
 
             if (CheckCollisionRecs(areaAtaque, playerRect)) {
-                int dano = bossDamageValor - personagem.dados.valorDefesa;
-                if (dano < 1) dano = 1;
-                personagem.dados.hp -= dano;
+                personagem.dados.hp -= 1;
                 if (personagem.dados.hp < 0) personagem.dados.hp = 0;
                 bossDamageCooldown = bossDamageInterval;
             }

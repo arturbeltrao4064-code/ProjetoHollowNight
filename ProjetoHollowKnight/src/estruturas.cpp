@@ -6,7 +6,7 @@ infoTela tela = {
     1500, 
     800, 
     "Hollow Knight",
-    { {0,0}, {0,0}, 0.0f, 0.25f }  // camera
+    { {0,0}, {0,0}, 0.0f, 1.0f }  // camera
 };
 
 infoEntidade personagem = {
@@ -17,7 +17,7 @@ infoEntidade personagem = {
     20,           // largura
     20,           // altura
     true,         // olhandoDireita 
-    { 100, 50, 10, 5, false, true , 0 } // dados
+    { 5, 5, 100, 0, 1, 5, false, true , 0 } // dados: hp, hpMax, mp, flask, atk, def...
 };
 
 // MODIFICADO: Inicializa o array de inimigos zerado. O mapa vai preencher cada um.

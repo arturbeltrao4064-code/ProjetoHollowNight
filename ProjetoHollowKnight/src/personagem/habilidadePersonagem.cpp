@@ -2,7 +2,7 @@
 #include <raylib.h>
 
 void disparaHabilidade() {
-    if (IsKeyPressed(KEY_Z) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= 20) {
+    if (IsKeyPressed(KEY_D) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= 20) {
         personagem.dados.mp -= 20;
         personagem.dados.habilidadesColetadas--;
         personagem.dados.habilidadeAtiva.ativo = true;

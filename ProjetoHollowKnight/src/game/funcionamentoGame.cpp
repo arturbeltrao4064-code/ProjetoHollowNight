@@ -8,6 +8,32 @@
 #include <string.h>
 #include <stdio.h>
 
+extern float flaskCarga;
+static float cooldownDanoJogador = 0.0f;
+
+static void adicionaCargaFlask(int valor) {
+    personagem.dados.flask += valor;
+    if (personagem.dados.flask > 100) personagem.dados.flask = 100;
+}
+
+static void empurraInimigoParaTras(infoEntidade* inimigo, float direcao) {
+    float deslocamento = 58.0f;
+    float novoX = inimigo->posicao.x + direcao * deslocamento;
+    float y = inimigo->posicao.y;
+    float w = (float)inimigo->largura;
+    float h = (float)inimigo->altura;
+
+    float checkX = (direcao > 0) ? (novoX + w) : novoX;
+    bool colideParede = blocoSolido(checkX, y + 2) || blocoSolido(checkX, y + h - 2);
+
+    if (!colideParede) {
+        inimigo->posicao.x = novoX;
+    }
+
+    // Recuo vertical mais forte para enfatizar o impacto.
+    inimigo->posicao.y -= 10.0f;
+}
+
 static void gerenciarTransicaoFases() {
     float mapaLargura = map.colunas * bloco.largura;
     bool mudouDeFase = false;
@@ -31,6 +57,7 @@ static void gerenciarTransicaoFases() {
         quantidadeInimigos = 0;
         bossAtivo = false;
         chefao.dados.vivo = false;
+        flaskCarga = 100.0f;
 
         loadMapa();
         inicializaPosicoesEntidades();
@@ -38,6 +65,11 @@ static void gerenciarTransicaoFases() {
 }
 
 void updateJogo() {
+    if (cooldownDanoJogador > 0.0f) {
+        cooldownDanoJogador -= GetFrameTime();
+        if (cooldownDanoJogador < 0.0f) cooldownDanoJogador = 0.0f;
+    }
+
     updatePersonagem();
     updateInimigo();
     updateBoss();
@@ -65,21 +97,27 @@ void updateJogo() {
             if (listaInimigos[i].dados.hp <= 0) {
                 listaInimigos[i].dados.hp = 0;
                 listaInimigos[i].dados.vivo = false;
+                adicionaCargaFlask(25);
             }
 
-            float direcaoInimigoEmpurrado = (personagem.posicao.x < listaInimigos[i].posicao.x) ? 1.0f : -1.0f;
-            listaInimigos[i].posicao.x += direcaoInimigoEmpurrado * 15.0f;
+            float direcaoInimigoEmpurrado = personagem.olhandoDireita ? 1.0f : -1.0f;
+            empurraInimigoParaTras(&listaInimigos[i], direcaoInimigoEmpurrado);
+            // Inimigo simples morto: recupera 25% do flask
+            if (!listaInimigos[i].dados.vivo) {
+                flaskCarga += 25.0f;
+                if (flaskCarga > 100.0f) flaskCarga = 100.0f;
+            }
             break;
         }
 
-        if (!personagem.dados.ataque && CheckCollisionRecs(rectPlayer, rectInimigo)) {
-            int dano = 20 - personagem.dados.valorDefesa;
-            if (dano < 1) dano = 1;
-            personagem.dados.hp -= dano;
+        if (!personagem.dados.ataque && cooldownDanoJogador <= 0.0f && CheckCollisionRecs(rectPlayer, rectInimigo)) {
+            personagem.dados.hp -= 1;
+            if (personagem.dados.hp < 0) personagem.dados.hp = 0;
             if (personagem.dados.hp <= 0) {
                 personagem.dados.hp = 0;
                 personagem.dados.vivo = false;
             }
+            cooldownDanoJogador = 0.8f;
 
             float direcaoKnockback = (personagem.posicao.x < listaInimigos[i].posicao.x) ? -1.0f : 1.0f;
             personagem.posicao.x += direcaoKnockback * 20.0f;
@@ -94,11 +132,14 @@ void updateJogo() {
             if (!listaInimigos[i].dados.vivo) continue;
             Rectangle rectInimigo = { listaInimigos[i].posicao.x, listaInimigos[i].posicao.y, (float)listaInimigos[i].largura, (float)listaInimigos[i].altura };
             if (CheckCollisionRecs(rectHab, rectInimigo)) {
-                listaInimigos[i].dados.hp -= 50;
+                listaInimigos[i].dados.hp -= 1;
                 personagem.dados.habilidadeAtiva.ativo = false;
+                float direcaoHab = personagem.dados.habilidadeAtiva.direcao ? 1.0f : -1.0f;
+                empurraInimigoParaTras(&listaInimigos[i], direcaoHab);
                 if (listaInimigos[i].dados.hp <= 0) {
                     listaInimigos[i].dados.hp = 0;
                     listaInimigos[i].dados.vivo = false;
+                    adicionaCargaFlask(25);
                 }
                 break;
             }
