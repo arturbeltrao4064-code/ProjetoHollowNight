@@ -9,4 +9,6 @@ void updateJogo();
 void drawJogo();
 void drawFundo();
 
-#endif
+extern FaseAtual faseDoJogo;
+
+#endif  

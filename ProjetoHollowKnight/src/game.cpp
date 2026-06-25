@@ -240,3 +240,4 @@ void drawJogo() {
     
     desenhaHud(personagem.dados.hp, personagem.dados.mp,personagem.dados.valorAtaque, personagem.dados.valorDefesa);
 }
+

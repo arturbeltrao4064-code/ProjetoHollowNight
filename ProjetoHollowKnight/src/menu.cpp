@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "game.h"
+#include "save.h"
 #include <raylib.h>
 #include <cstdlib>
 
@@ -54,31 +55,25 @@ void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado
     float x = tela.largura / 2.0f - menuPrincipal.botaoW / 2.0f;
     float y = menuPrincipal.botoesY[posIndex] - menuPrincipal.botaoH / 2.0f;
     
-    // Determina a cor do bloco do botão baseado no seu estado
     Color corBotao = desabilitado ? GRAY : LIGHTGRAY;
     if (posIndex == selecionado && !desabilitado) corBotao = RAYWHITE;
 
-    // Desenha o corpo do retângulo do botão
     DrawRectangle((int)x, (int)y, menuPrincipal.botaoW, menuPrincipal.botaoH, corBotao);
 
-    // Converte o índice de textura antigo em um texto legível
     const char* textoBotao = "BOTAO";
     switch (texIndex) {
-        case 0: textoBotao = "JOGAR"; break;
+        case 0: textoBotao = "NOVO JOGO"; break;
         case 1: textoBotao = "CARREGAR"; break;
         case 2: textoBotao = "OPCOES"; break;
         case 3: textoBotao = "SAIR"; break;
-        case 4: textoBotao = "SALVAR"; break;
         case 5: textoBotao = "AJUDA"; break;
     }
 
-    // Centraliza o texto perfeitamente dentro do retângulo alocado
     int tamTexto = MeasureText(textoBotao, 20);
     int textX = (int)(x + (menuPrincipal.botaoW / 2.0f) - (tamTexto / 2.0f));
     int textY = (int)(y + (menuPrincipal.botaoH / 2.0f) - 10);
     DrawText(textoBotao, textX, textY, 20, desabilitado ? DARKGRAY : BLACK);
 
-    // Desenha a borda amarela de seleção (substituindo a antiga borda branca)
     if (posIndex == selecionado && !desabilitado)
         DrawRectangleLinesEx({ x - 2, y - 2, (float)menuPrincipal.botaoW + 4, (float)menuPrincipal.botaoH + 4 }, 2, YELLOW);
 }
@@ -191,40 +186,33 @@ void updateMenuPrincipal() {
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
         menuPrincipal.opcaoSelecionada = (menuPrincipal.opcaoSelecionada - 1 + menuPrincipal.totalOpcoes) % menuPrincipal.totalOpcoes;
 
-    // Atalho direto: Pressionar a tecla A foca na opção AJUDA (que agora é o índice 3 de posição)
-    if (IsKeyPressed(KEY_A)) {
-        menuPrincipal.opcaoSelecionada = 3; 
-    }
-
-    // Mantém o pulo do botão "CARREGAR" (índice 1) que está desabilitado
-    if (menuPrincipal.opcaoSelecionada == 1) {
-        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) menuPrincipal.opcaoSelecionada = 2;
-        else menuPrincipal.opcaoSelecionada = 0;
-    }
-    
     if (IsKeyPressed(KEY_ENTER)) {
-        // Agora o switch valida com base na ordem visual das posições (posIndex)
         switch (menuPrincipal.opcaoSelecionada) {
-            case 0: estadoAtual = ESTADO_JOGANDO;       break;
-            case 1: /* Carregar — futuro */              break;
-            case 2: estadoAtual = ESTADO_CONFIGURACOES; break;
-            case 3: /* Futuro: estadoAtual = ESTADO_AJUDA; */ break; // Opção AJUDA selecionada
-            case 4: CloseWindow(); exit(0);             break; // Opção SAIR selecionada
+            case 0: // Novo Jogo
+                personagem.dados.hp = 100;
+                personagem.dados.mp = 50;
+                personagem.dados.habilidadesColetadas = 0;
+                personagem.dados.amuletosColetados = 0;
+                for (int i = 0; i < TOTAL_AMULETOS; i++) {
+                    personagem.dados.amuletos[i].coletado = false;
+                }
+                faseDoJogo = FASE_VILA;
+                estadoAtual = ESTADO_JOGANDO;
+                break;
+            case 1: // Carregar
+                carregaJogo();
+                estadoAtual = ESTADO_JOGANDO;
+                break;
+            case 2: // Configurações
+                estadoAtual = ESTADO_CONFIGURACOES;
+                break;
+            case 3: // Ajuda
+                break;
+            case 4: // Sair
+                CloseWindow(); 
+                exit(0);
+                break;
         }
-    }
-    
-    if (IsKeyPressed(KEY_N)) {
-        estadoAtual = ESTADO_JOGANDO;
-    }
-    if (IsKeyPressed(KEY_C)) {
-        // Carregar — futuro
-    }
-    if (IsKeyPressed(KEY_O)) {
-        estadoAtual = ESTADO_CONFIGURACOES;
-    }
-    if (IsKeyPressed(KEY_S)) {
-        CloseWindow(); 
-        exit(0);
     }
 }
 
@@ -243,10 +231,10 @@ void updatePause() {
             case 1: estadoAtual = ESTADO_INVENTARIO; break; 
             case 2: estadoAtual = ESTADO_MENU;    break;
             case 3: CloseWindow(); exit(0);        break;
+            case 4: salvaJogo();                   break; // ← ADICIONA
         }
     }
 }
-
 void updateConfiguracoes() {
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
         menuConfiguracoes.opcaoSelecionada = (menuConfiguracoes.opcaoSelecionada + 1) % menuConfiguracoes.totalOpcoes;
@@ -282,22 +270,17 @@ void desenhaMenu() {
     ClearBackground(BLACK);
 
     if (estadoAtual == ESTADO_MENU) {
-        desenhaFundoMenu();
+    desenhaFundoMenu();
+    
+    desenhaBotao(0, 0, menuPrincipal.opcaoSelecionada, false); // NOVO JOGO
+    desenhaBotao(1, 1, menuPrincipal.opcaoSelecionada, false); // CARREGAR (agora habilitado!)
+    desenhaBotao(2, 2, menuPrincipal.opcaoSelecionada, false); // OPCOES
+    desenhaBotao(5, 3, menuPrincipal.opcaoSelecionada, false); // AJUDA
+    desenhaBotao(3, 4, menuPrincipal.opcaoSelecionada, false); // SAIR
         
-        // Renderiza os botões respeitando a nova ordem visual (posIndex)
-        desenhaBotao(0, 0, menuPrincipal.opcaoSelecionada, false); // JOGAR
-        desenhaBotao(1, 1, menuPrincipal.opcaoSelecionada, true);  // CARREGAR (Desabilitado)
-        desenhaBotao(2, 2, menuPrincipal.opcaoSelecionada, false); // OPCOES
-        
-        // MODIFICADO: AJUDA (texIndex=5) agora fica na posição 3 (acima do Sair)
-        desenhaBotao(5, 3, menuPrincipal.opcaoSelecionada, false); 
-        
-        // MODIFICADO: SAIR (texIndex=3) agora vai para a última posição 4
-        desenhaBotao(3, 4, menuPrincipal.opcaoSelecionada, false); 
-            
-        DrawText("W/S = Navegar | A = Ajuda | ENTER = Selecionar",
-            tela.largura / 2 - MeasureText("W/S = Navegar | A = Ajuda | ENTER = Selecionar", 16) / 2,
-            tela.altura - 30, 16, DARKGRAY);
+    DrawText("W/S = Navegar | ENTER = Selecionar",
+        tela.largura / 2 - MeasureText("W/S = Navegar | ENTER = Selecionar", 16) / 2,
+        tela.altura - 30, 16, DARKGRAY);
     }
     else if (estadoAtual == ESTADO_JOGANDO) {
         drawJogo();
