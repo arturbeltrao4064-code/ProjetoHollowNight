@@ -10,6 +10,9 @@
 FaseAtual faseDoJogo = FASE_VILA;
 extern float flaskCarga;
 
+static const int HP_INIMIGO_NORMAL = 3;
+static const int HP_BOSS = HP_INIMIGO_NORMAL * 2;
+
 const char* caminhoMapaPorFase(FaseAtual fase) {
     switch (fase) {
         case FASE_VILA: return "maps/vila.txt";
@@ -18,6 +21,18 @@ const char* caminhoMapaPorFase(FaseAtual fase) {
         case FASE_TUNEL3: return "maps/tunel3.txt";
         default: return "maps/vila.txt";
     }
+}
+
+static const char* caminhoFundoPorFase(FaseAtual fase) {
+    if (fase == FASE_VILA) return "assets/Cenario/fundoVila.png";
+    return "assets/Cenario/fundoCenario.png";
+}
+
+void atualizarFundoJogo() {
+    if (tela.fundoJogo.width > 0) {
+        UnloadTexture(tela.fundoJogo);
+    }
+    tela.fundoJogo = LoadTexture(caminhoFundoPorFase(faseDoJogo));
 }
 
 void carregarMapaAtualComEntidades() {
@@ -53,6 +68,7 @@ void inicializaPosicoesEntidades() {
     bossState.podeReceberDano = false;
     bossState.entidade.dados.vivo = false;
     bossState.entidade.dados.hp = 0;
+    bossState.entidade.dados.hpMax = 0;
 
     for (int i = 0; i < map.linhas; i++) {
         for (int j = 0; j < map.colunas; j++) {
@@ -74,7 +90,8 @@ void inicializaPosicoesEntidades() {
                     listaInimigos[quantidadeInimigos].altura = 30;
                     listaInimigos[quantidadeInimigos].olhandoDireita = true;
                     // Sistema por hits: cada inimigo aguenta 3 acertos.
-                    listaInimigos[quantidadeInimigos].dados.hp = 3;
+                    listaInimigos[quantidadeInimigos].dados.hp = HP_INIMIGO_NORMAL;
+                    listaInimigos[quantidadeInimigos].dados.hpMax = HP_INIMIGO_NORMAL;
                     listaInimigos[quantidadeInimigos].dados.mp = 0;
                     listaInimigos[quantidadeInimigos].dados.vivo = true;
 
@@ -86,7 +103,8 @@ void inicializaPosicoesEntidades() {
                 bossState.entidade.posicaoInicial = (Vector2){ posX, posY };
                 bossState.entidade.largura = 30;
                 bossState.entidade.altura = 30;
-                bossState.entidade.dados.hp = 500;
+                bossState.entidade.dados.hp = HP_BOSS;
+                bossState.entidade.dados.hpMax = HP_BOSS;
                 bossState.entidade.dados.vivo = true;
                 bossState.ativo = true;
                 TraceLog(LOG_INFO, "Boss 'C' carregado na posicao: %.2f, %.2f", posX, posY);
@@ -103,7 +121,7 @@ void loadJogo() {
     loadPersonagem();
     loadInimigo();
     loadBoss();
-    tela.fundoJogo = LoadTexture("Fundos/Jogo/FundoJogo.png");
+    atualizarFundoJogo();
 }
 
 void unloadJogo() {

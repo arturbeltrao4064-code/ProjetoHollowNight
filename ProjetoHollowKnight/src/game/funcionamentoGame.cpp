@@ -15,6 +15,7 @@ static float cooldownDanoJogador = 0.0f;
 static void adicionaCargaFlask(int valor) {
     personagem.dados.flask += valor;
     if (personagem.dados.flask > 100) personagem.dados.flask = 100;
+    flaskCarga = (float)personagem.dados.flask;
 }
 
 static void empurraInimigoParaTras(infoEntidade* inimigo, float direcao) {
@@ -61,10 +62,6 @@ static bool processaCombateContraInimigo(const Rectangle& rectPlayer, const Rect
 
         float direcaoInimigoEmpurrado = personagem.olhandoDireita ? 1.0f : -1.0f;
         empurraInimigoParaTras(inimigo, direcaoInimigoEmpurrado);
-        if (!inimigo->dados.vivo) {
-            flaskCarga += 25.0f;
-            if (flaskCarga > 100.0f) flaskCarga = 100.0f;
-        }
         return true;
     }
 
@@ -156,10 +153,17 @@ static void trocarMapa(const char* novoMapa) {
     quantidadeInimigos = 0;
     bossState.ativo = false;
     bossState.entidade.dados.vivo = false;
+    bossState.entidade.dados.hp = 0;
     flaskCarga = 100.0f;
 
     loadMapa();
     inicializaPosicoesEntidades();
+    atualizarFundoJogo();
+}
+
+static bool podeSairDaFaseAtual() {
+    if (faseDoJogo == FASE_VILA) return true;
+    return bossState.ativo && !bossState.entidade.dados.vivo;
 }
 
 static void gerenciarTransicaoFases() {
@@ -177,6 +181,10 @@ static void gerenciarTransicaoFases() {
             faseDoJogo = FASE_TUNEL3;
             trocarMapa("maps/tunel3.txt");
         }
+        return;
+    }
+
+    if (chegouDireita && !podeSairDaFaseAtual()) {
         return;
     }
 

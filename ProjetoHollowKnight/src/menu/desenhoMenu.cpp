@@ -4,32 +4,32 @@
 #include <raylib.h>
 #include <stdio.h>
 
+static void desenhaImagemBotao(Texture2D textura, float x, float y, float w, float h, Color tint) {
+    if (textura.width > 0 && textura.height > 0) {
+        Rectangle src = { 0.0f, 0.0f, (float)textura.width, (float)textura.height };
+        Rectangle dst = { x, y, w, h };
+        Vector2 origin = { 0.0f, 0.0f };
+        DrawTexturePro(textura, src, dst, origin, 0.0f, tint);
+    } else {
+        DrawRectangle((int)x, (int)y, (int)w, (int)h, tint);
+    }
+}
+
 void desenhaFundoMenu() {
-    ClearBackground(DARKGRAY);
-    const char* tituloJogo = "HOLLOW KNIGHT (PROTO)";
-    int tamTitulo = MeasureText(tituloJogo, 40);
-    DrawText(tituloJogo, tela.largura / 2 - tamTitulo / 2, 100, 40, LIGHTGRAY);
+    if (menuPrincipal.menuImagem[0].width > 0) {
+        DrawTexturePro(menuPrincipal.menuImagem[0], { 0.0f, 0.0f, (float)menuPrincipal.menuImagem[0].width, (float)menuPrincipal.menuImagem[0].height }, { 0.0f, 0.0f, (float)tela.largura, (float)tela.altura }, { 0, 0 }, 0.0f, WHITE);
+    } else {
+        ClearBackground(DARKGRAY);
+    }
+
 }
 
 void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado) {
     float x = tela.largura / 2.0f - menuPrincipal.botaoW / 2.0f;
     float y = menuPrincipal.botoesY[posIndex] - menuPrincipal.botaoH / 2.0f;
-    Color corBotao = desabilitado ? GRAY : LIGHTGRAY;
-    if (posIndex == selecionado && !desabilitado) corBotao = RAYWHITE;
-    DrawRectangle((int)x, (int)y, menuPrincipal.botaoW, menuPrincipal.botaoH, corBotao);
-
-    const char* textoBotao = "BOTAO";
-    switch (texIndex) {
-        case 0: textoBotao = "NOVO JOGO"; break;
-        case 1: textoBotao = "CARREGAR"; break;
-        case 2: textoBotao = "AJUDA"; break;
-        case 3: textoBotao = "SAIR"; break;
-    }
-
-    int tamTexto = MeasureText(textoBotao, 20);
-    int textX = (int)(x + (menuPrincipal.botaoW / 2.0f) - (tamTexto / 2.0f));
-    int textY = (int)(y + (menuPrincipal.botaoH / 2.0f) - 10);
-    DrawText(textoBotao, textX, textY, 20, desabilitado ? DARKGRAY : BLACK);
+    Color corBotao = desabilitado ? Fade(GRAY, 0.75f) : WHITE;
+    if (posIndex == selecionado && !desabilitado) corBotao = WHITE;
+    desenhaImagemBotao(menuPrincipal.menuBotoes[texIndex], x, y, (float)menuPrincipal.botaoW, (float)menuPrincipal.botaoH, corBotao);
 
     if (posIndex == selecionado && !desabilitado)
         DrawRectangleLinesEx({ x - 2, y - 2, (float)menuPrincipal.botaoW + 4, (float)menuPrincipal.botaoH + 4 }, 2, YELLOW);
@@ -38,23 +38,10 @@ void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado
 void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabilitado) {
     float x = tela.largura / 2.0f - menuPause.botaoW / 2.0f;
     float y = menuPause.botoesY[posIndex] - menuPause.botaoH / 2.0f;
-    Color corBotao = desabilitado ? GRAY : LIGHTGRAY;
-    if (posIndex == selecionado && !desabilitado) corBotao = RAYWHITE;
-    DrawRectangle((int)x, (int)y, menuPause.botaoW, menuPause.botaoH, corBotao);
+    Color corBotao = desabilitado ? Fade(GRAY, 0.75f) : WHITE;
+    if (posIndex == selecionado && !desabilitado) corBotao = WHITE;
+    desenhaImagemBotao(menuPause.menuBotoes[texIndex], x, y, (float)menuPause.botaoW, (float)menuPause.botaoH, corBotao);
 
-    const char* textoBotao = "BOTAO";
-    switch (texIndex) {
-        case 0: textoBotao = "CONTINUAR"; break;
-        case 1: textoBotao = "INVENTARIO"; break;
-        case 2: textoBotao = "MENU PRINCIPAL"; break;
-        case 3: textoBotao = "SALVAR"; break;
-        case 4: textoBotao = "SAIR"; break;
-    }
-
-    int tamTexto = MeasureText(textoBotao, 18);
-    int textX = (int)(x + (menuPause.botaoW / 2.0f) - (tamTexto / 2.0f));
-    int textY = (int)(y + (menuPause.botaoH / 2.0f) - 9);
-    DrawText(textoBotao, textX, textY, 18, desabilitado ? DARKGRAY : BLACK);
     if (posIndex == selecionado && !desabilitado)
         DrawRectangleLinesEx({ x - 2, y - 2, (float)menuPause.botaoW + 4, (float)menuPause.botaoH + 4 }, 2, YELLOW);
 }
@@ -71,7 +58,7 @@ void desenhaInventario() {
     int invAltura = 470;
     int invX = tela.largura / 2 - invLargura / 2;
     int invY = tela.altura / 2 - invAltura / 2;
-    DrawRectangle(invX, invY, invLargura, invAltura, DARKGRAY);
+    DrawRectangle(invX, invY, invLargura, invAltura, (Color){20, 20, 20, 235});
     DrawRectangleLines(invX, invY, invLargura, invAltura, WHITE);
     DrawText("INVENTARIO DE AMULETOS", invX + 30, invY + 20, 26, YELLOW);
     DrawText("Use SETAS para navegar, ENTER para equipar", invX + 30, invY + 55, 14, LIGHTGRAY);
@@ -108,6 +95,12 @@ void desenhaInventario() {
             float alfa = equipado ? 0.65f : 0.35f;
             DrawRectangleRec(slot, Fade(cores[i], alfa));
             DrawRectangleLinesEx(slot, selecionado ? 4 : 2, selecionado ? WHITE : cores[i]);
+            if (texturaAmuletos[i].width > 0 && texturaAmuletos[i].height > 0) {
+                Rectangle src = { 0.0f, 0.0f, (float)texturaAmuletos[i].width, (float)texturaAmuletos[i].height };
+                Rectangle dst = { slot.x + 32, slot.y + 18, 80, 80 };
+                Vector2 origin = { 0.0f, 0.0f };
+                DrawTexturePro(texturaAmuletos[i], src, dst, origin, 0.0f, WHITE);
+            }
             DrawText(nomes[i],   (int)(slot.x + 10), (int)(slot.y + 20), 18, WHITE);
             DrawText(efeitos[i], (int)(slot.x + 10), (int)(slot.y + 55), 12, YELLOW);
             if (equipado) {

@@ -123,9 +123,18 @@ void updateBoss() {
 
 void desenhaBoss() {
     if (bossState.ativo && bossState.entidade.dados.vivo) {
-        DrawRectangle((int)bossState.entidade.posicao.x, (int)bossState.entidade.posicao.y, bossState.entidade.largura, bossState.entidade.altura, ORANGE);
+        Texture2D texturaAtual = bossState.entidade.olhandoDireita ? bossState.entidade.imagem[0] : bossState.entidade.imagem[1];
+        if (texturaAtual.width > 0 && texturaAtual.height > 0) {
+            Rectangle src = { 0.0f, 0.0f, (float)texturaAtual.width, (float)texturaAtual.height };
+            Rectangle dst = { bossState.entidade.posicao.x, bossState.entidade.posicao.y, (float)bossState.entidade.largura, (float)bossState.entidade.altura };
+            Vector2 origin = { 0.0f, 0.0f };
+            DrawTexturePro(texturaAtual, src, dst, origin, 0.0f, WHITE);
+        } else {
+            DrawRectangle((int)bossState.entidade.posicao.x, (int)bossState.entidade.posicao.y, bossState.entidade.largura, bossState.entidade.altura, ORANGE);
+        }
         DrawRectangle((int)bossState.entidade.posicao.x, (int)bossState.entidade.posicao.y - 15, bossState.entidade.largura, 6, RED);
-        float vidaPercent = (float)bossState.entidade.dados.hp / 500.0f;
+        float hpMaxBoss = (bossState.entidade.dados.hpMax > 0) ? (float)bossState.entidade.dados.hpMax : 1.0f;
+        float vidaPercent = (float)bossState.entidade.dados.hp / hpMaxBoss;
         DrawRectangle((int)bossState.entidade.posicao.x, (int)bossState.entidade.posicao.y - 15, (int)(bossState.entidade.largura * vidaPercent), 6, GREEN);
     }
 }

@@ -2,24 +2,43 @@
 #include "mapa.h"
 #include <raylib.h>
 
+static const int FLASK_CUSTO_POR_CURA = 33;
+static const float TEMPO_CURA_SEGUNDOS = 3.0f;
+
 static float tempoAtaque = 0.0f;
 static float acumuladorRegenMP = 0.0f;
-static float flaskTempoSegurando = 0.0f;
-static bool flask1HitDado = false;
 
 float flaskCarga = 100.0f;
 float avisoVidaCheia = 0.0f;
 static float tempoCanalizandoCura = 0.0f;
 
+static Texture2D texturaPersonagemDireita = { 0 };
+static Texture2D texturaPersonagemEsquerda = { 0 };
+static Texture2D texturaPersonagemAtacando = { 0 };
+
 void loadPersonagem() {
     inicializaAmuletos();
     flaskCarga = 100.0f;
     avisoVidaCheia = 0.0f;
-    flaskTempoSegurando = 0.0f;
-    flask1HitDado = false;
+    tempoCanalizandoCura = 0.0f;
+
+    texturaPersonagemDireita = LoadTexture("assets/Personagem/personagemDireita.png");
+    texturaPersonagemEsquerda = LoadTexture("assets/Personagem/personagemEsquerda.png");
+    texturaPersonagemAtacando = LoadTexture("assets/Personagem/personagemAtacando.png");
+    texturaHabilidade[0] = LoadTexture("assets/Objetos/habilidadeDireita.png");
+    texturaHabilidade[1] = LoadTexture("assets/Objetos/habilidadeEsquerda.png");
+
+    personagem.imagem[0] = texturaPersonagemDireita;
+    personagem.imagem[1] = texturaPersonagemEsquerda;
+    personagem.imagem[2] = texturaPersonagemAtacando;
 }
 
 void unloadPersonagem() {
+    UnloadTexture(texturaPersonagemDireita);
+    UnloadTexture(texturaPersonagemEsquerda);
+    UnloadTexture(texturaPersonagemAtacando);
+    UnloadTexture(texturaHabilidade[0]);
+    UnloadTexture(texturaHabilidade[1]);
 }
 
 void updatePersonagem() {
@@ -52,28 +71,32 @@ void updatePersonagem() {
         acumuladorRegenMP = 0.0f;
     }
 
-    if (IsKeyDown(KEY_A)) {
+    if (personagem.dados.flask < 0) personagem.dados.flask = 0;
+    if (personagem.dados.flask > 100) personagem.dados.flask = 100;
+
+    bool podeCanalizarCura = personagem.dados.hp < personagem.dados.hpMax && personagem.dados.flask >= FLASK_CUSTO_POR_CURA;
+    if (IsKeyDown(KEY_A) && podeCanalizarCura) {
         tempoCanalizandoCura += GetFrameTime();
+        if (tempoCanalizandoCura > TEMPO_CURA_SEGUNDOS) tempoCanalizandoCura = TEMPO_CURA_SEGUNDOS;
+
+        float progressoCura = tempoCanalizandoCura / TEMPO_CURA_SEGUNDOS;
+        flaskCarga = (float)personagem.dados.flask - (FLASK_CUSTO_POR_CURA * progressoCura);
+        if (flaskCarga < 0.0f) flaskCarga = 0.0f;
+    } else {
+        flaskCarga = (float)personagem.dados.flask;
     }
 
     if (IsKeyReleased(KEY_A)) {
-        int hitsPorTempo = (int)(tempoCanalizandoCura / 3.0f);
-        if (hitsPorTempo > 2) hitsPorTempo = 2;
+        if (tempoCanalizandoCura >= TEMPO_CURA_SEGUNDOS && podeCanalizarCura) {
+            personagem.dados.hp += 1;
+            if (personagem.dados.hp > personagem.dados.hpMax) personagem.dados.hp = personagem.dados.hpMax;
 
-        int hitsFaltando = 5 - personagem.dados.hp;
-        int hitsPorFlask = personagem.dados.flask / 50;
-        int hitsCurados = hitsPorTempo;
-        if (hitsCurados > hitsFaltando) hitsCurados = hitsFaltando;
-        if (hitsCurados > hitsPorFlask) hitsCurados = hitsPorFlask;
-
-        if (hitsCurados > 0) {
-            personagem.dados.hp += hitsCurados;
-            personagem.dados.flask -= hitsCurados * 50;
+            personagem.dados.flask -= FLASK_CUSTO_POR_CURA;
             if (personagem.dados.flask < 0) personagem.dados.flask = 0;
-            if (personagem.dados.hp > 5) personagem.dados.hp = 5;
         }
 
         tempoCanalizandoCura = 0.0f;
+        flaskCarga = (float)personagem.dados.flask;
     }
 
     personagem.posicao = movimentaPersonagem(personagem.posicao);
@@ -84,8 +107,15 @@ void updatePersonagem() {
 }
 
 void desenhaPersonagem() {
-    Color corAtual = personagem.dados.ataque ? PINK : GREEN;
-    DrawRectangle((int)personagem.posicao.x, (int)personagem.posicao.y, personagem.largura, personagem.altura, corAtual);
+    Texture2D texturaAtual = personagem.dados.ataque ? personagem.imagem[2] : (personagem.olhandoDireita ? personagem.imagem[0] : personagem.imagem[1]);
+    if (texturaAtual.width > 0 && texturaAtual.height > 0) {
+        Rectangle src = { 0.0f, 0.0f, (float)texturaAtual.width, (float)texturaAtual.height };
+        Rectangle dst = { personagem.posicao.x, personagem.posicao.y, (float)personagem.largura, (float)personagem.altura };
+        DrawTexturePro(texturaAtual, src, dst, { 0, 0 }, 0.0f, WHITE);
+    } else {
+        Color corAtual = personagem.dados.ataque ? PINK : GREEN;
+        DrawRectangle((int)personagem.posicao.x, (int)personagem.posicao.y, personagem.largura, personagem.altura, corAtual);
+    }
 
     if (personagem.dados.ataque) {
         int espadaLargura = personagem.largura;

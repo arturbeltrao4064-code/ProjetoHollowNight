@@ -1,10 +1,11 @@
 #include "personagem.h"
 #include <raylib.h>
 
+static const int CUSTO_MP_HABILIDADE = 33;
+
 void disparaHabilidade() {
-    if (IsKeyPressed(KEY_D) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= 20) {
-        personagem.dados.mp -= 20;
-        personagem.dados.habilidadesColetadas--;
+    if (IsKeyPressed(KEY_D) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= CUSTO_MP_HABILIDADE) {
+        personagem.dados.mp -= CUSTO_MP_HABILIDADE;
         personagem.dados.habilidadeAtiva.ativo = true;
         personagem.dados.habilidadeAtiva.posicao = personagem.posicao;
         personagem.dados.habilidadeAtiva.velocidade = 8.0f;

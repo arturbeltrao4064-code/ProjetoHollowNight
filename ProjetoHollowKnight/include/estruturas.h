@@ -114,6 +114,9 @@ typedef struct {
     float altura;
 } infoBloco;
 
+extern Texture2D texturaAmuletos[TOTAL_AMULETOS];
+extern Texture2D texturaHabilidade[2];
+
 extern infoTela tela;
 extern infoEntidade personagem;
 

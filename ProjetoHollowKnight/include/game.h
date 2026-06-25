@@ -12,6 +12,7 @@ void inicializaPosicoesEntidades();
 const char* caminhoMapaPorFase(FaseAtual fase);
 void carregarMapaAtualComEntidades();
 void resetarEstadoNovoJogo();
+void atualizarFundoJogo();
 
 extern FaseAtual faseDoJogo;
 

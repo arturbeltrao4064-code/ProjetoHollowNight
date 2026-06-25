@@ -1,12 +1,20 @@
 #include "inimigo.h"
 #include <raylib.h>
 
+static Texture2D texturaInimigoDireita = { 0 };
+static Texture2D texturaInimigoEsquerda = { 0 };
+
 void loadInimigo() {
-    listaInimigos[0].imagem[0] = LoadTexture("Texturas/Inimigo/Inimigo.png");
-    listaInimigos[0].imagem[1] = LoadTexture("Texturas/Inimigo/InverteInimigo.png");
+    texturaInimigoDireita = LoadTexture("assets/Inimigos/inimigoDireita.png");
+    texturaInimigoEsquerda = LoadTexture("assets/Inimigos/inimigoEsquerda.png");
+
+    for (int i = 0; i < MAX_INIMIGOS; i++) {
+        listaInimigos[i].imagem[0] = texturaInimigoDireita;
+        listaInimigos[i].imagem[1] = texturaInimigoEsquerda;
+    }
 }
 
 void unloadInimigo() {
-    UnloadTexture(listaInimigos[0].imagem[0]);
-    UnloadTexture(listaInimigos[0].imagem[1]);
+    UnloadTexture(texturaInimigoDireita);
+    UnloadTexture(texturaInimigoEsquerda);
 }

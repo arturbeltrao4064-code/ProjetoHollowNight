@@ -11,6 +11,15 @@ static int proximoAmuletoNaoColetado() {
 }
 
 static void desenhaAmuletoPorTipo(float posX, float posY, int tipo) {
+    Texture2D textura = texturaAmuletos[tipo];
+    if (textura.width > 0 && textura.height > 0) {
+        Rectangle src = { 0.0f, 0.0f, (float)textura.width, (float)textura.height };
+        Rectangle dst = { posX, posY, bloco.largura, bloco.altura };
+        Vector2 origin = { 0.0f, 0.0f };
+        DrawTexturePro(textura, src, dst, origin, 0.0f, WHITE);
+        return;
+    }
+
     if (tipo == AMULETO_ATAQUE) {
         DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, YELLOW);
         DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, ORANGE);

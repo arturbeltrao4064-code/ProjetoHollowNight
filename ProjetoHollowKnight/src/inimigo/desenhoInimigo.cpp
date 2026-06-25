@@ -12,8 +12,15 @@ void updateInimigo() {
 void desenhaInimigo() {
     for (int i = 0; i < quantidadeInimigos; i++) {
         if (listaInimigos[i].dados.vivo) {
-            DrawRectangle((int)listaInimigos[i].posicao.x, (int)listaInimigos[i].posicao.y,
-                         listaInimigos[i].largura, listaInimigos[i].altura, RED);
+            Texture2D texturaAtual = listaInimigos[i].olhandoDireita ? listaInimigos[i].imagem[0] : listaInimigos[i].imagem[1];
+            if (texturaAtual.width > 0 && texturaAtual.height > 0) {
+                Rectangle src = { 0.0f, 0.0f, (float)texturaAtual.width, (float)texturaAtual.height };
+                Rectangle dst = { listaInimigos[i].posicao.x, listaInimigos[i].posicao.y, (float)listaInimigos[i].largura, (float)listaInimigos[i].altura };
+                DrawTexturePro(texturaAtual, src, dst, { 0, 0 }, 0.0f, WHITE);
+            } else {
+                DrawRectangle((int)listaInimigos[i].posicao.x, (int)listaInimigos[i].posicao.y,
+                             listaInimigos[i].largura, listaInimigos[i].altura, RED);
+            }
         }
     }
 }

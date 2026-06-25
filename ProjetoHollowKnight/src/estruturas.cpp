@@ -13,6 +13,8 @@ infoMenu menuPrincipal = { 0 };
 infoMenu menuPause = { 0 };
 constantes constantesJogo = { 0 };
 BossState bossState = { 0 };
+Texture2D texturaAmuletos[TOTAL_AMULETOS] = { 0 };
+Texture2D texturaHabilidade[2] = { 0 };
 
 static void inicializaTela() {
     tela.largura = 1500;

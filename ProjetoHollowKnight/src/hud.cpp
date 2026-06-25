@@ -10,6 +10,9 @@ void desenhaHud(int hp, int mp, int ataque, int defesa) {
     (void)ataque;
     (void)defesa;
 
+    const float FLASK_MAX = 100.0f;
+    const float FLASK_SEGMENTO = FLASK_MAX / 3.0f;
+
     int barLargura = 200;
     int barAltura  = 18;
     int x          = 20;
@@ -43,14 +46,30 @@ void desenhaHud(int hp, int mp, int ataque, int defesa) {
     DrawRectangleLines(x, yEnergia, barLargura, barAltura, WHITE);
     DrawText("MP", x + barLargura + 8, yEnergia + 2, 14, WHITE);
 
-    // --- FLASK (cura) ---
-    int flask = personagem.dados.flask;
-    if (flask < 0) flask = 0;
-    if (flask > 100) flask = 100;
-    DrawRectangle(x, yFlask, barLargura, barAltura, (Color){ 35, 35, 0, 200 });
-    DrawRectangle(x, yFlask, (int)(barLargura * (flask / 100.0f)), barAltura, GOLD);
-    DrawRectangleLines(x, yFlask, barLargura, barAltura, WHITE);
-    DrawText("FLASK", x + barLargura + 8, yFlask + 2, 14, WHITE);
+    // --- FLASK (cura em 3 segmentos) ---
+    float flaskVisual = flaskCarga;
+    if (flaskVisual < 0.0f) flaskVisual = 0.0f;
+    if (flaskVisual > FLASK_MAX) flaskVisual = FLASK_MAX;
+
+    DrawText("FLASK", x, yFlask - 2, 14, WHITE);
+    int flaskW = 28;
+    int flaskH = 14;
+    int flaskGap = 6;
+    int flaskX0 = x + 60;
+
+    // Segmentos drenam da esquerda para a direita.
+    for (int i = 0; i < 3; i++) {
+        float segmentoMax = FLASK_MAX - (i * FLASK_SEGMENTO);
+        float segmentoMin = segmentoMax - FLASK_SEGMENTO;
+        float preenchimento = (flaskVisual - segmentoMin) / FLASK_SEGMENTO;
+        if (preenchimento < 0.0f) preenchimento = 0.0f;
+        if (preenchimento > 1.0f) preenchimento = 1.0f;
+
+        int fx = flaskX0 + i * (flaskW + flaskGap);
+        DrawRectangle(fx, yFlask, flaskW, flaskH, (Color){ 35, 35, 0, 200 });
+        DrawRectangle(fx, yFlask, (int)(flaskW * preenchimento), flaskH, GOLD);
+        DrawRectangleLines(fx, yFlask, flaskW, flaskH, WHITE);
+    }
 
     // --- HABILIDADES ---
     int yHab = tela.altura - 95;
