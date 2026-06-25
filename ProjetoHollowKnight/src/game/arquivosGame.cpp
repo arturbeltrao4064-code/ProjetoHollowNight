@@ -69,6 +69,7 @@ void loadJogo() {
 
     loadMapa();
     inicializaPosicoesEntidades();
+    loadPersonagem();
     loadInimigo();
     loadBoss();
     tela.fundoJogo = LoadTexture("Fundos/Jogo/FundoJogo.png");
