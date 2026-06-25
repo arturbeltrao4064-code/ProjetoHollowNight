@@ -83,6 +83,81 @@ void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado
         DrawRectangleLinesEx({ x - 2, y - 2, (float)menuPrincipal.botaoW + 4, (float)menuPrincipal.botaoH + 4 }, 2, YELLOW);
 }
 
+void desenhaInventario() {
+    drawJogo(); // Desenha o jogo ao fundo
+
+    // Overlay escuro
+    DrawRectangle(0, 0, tela.largura, tela.altura, { 0, 0, 0, 150 });
+
+    // Define as dimensões do painel do Inventário
+    int invLargura = 700;
+    int invAltura = 450;
+    int invX = tela.largura / 2 - invLargura / 2;
+    int invY = tela.altura / 2 - invAltura / 2;
+
+    // Desenha a caixa principal do Inventário
+    DrawRectangle(invX, invY, invLargura, invAltura, DARKGRAY);
+    DrawRectangleLines(invX, invY, invLargura, invAltura, WHITE);
+
+    // Título do Inventário
+    DrawText("INVENTARIO DE AMULETOS", invX + 30, invY + 30, 28, YELLOW);
+    DrawText("Amuletos Coletados: ", invX + 30, invY + 70, 18, WHITE);
+    
+    char contadorText[20];
+    DrawText(contadorText, invX + 280, invY + 70, 18, YELLOW);
+
+    // Listar os amuletos lado a lado
+    int startX = invX + 60;
+    int startY = invY + 130;
+    int espacamentoX = 200;
+
+    for (int i = 0; i < TOTAL_AMULETOS; i++) {
+        Rectangle slot = { (float)(startX + (i * espacamentoX)), (float)startY, 140, 140 };
+        
+        const char* nomeAmuleto = "";
+        const char* efeito = "";
+        Color corAmuleto = GRAY;
+
+        if (i == AMULETO_ATAQUE) { 
+            nomeAmuleto = "ATAQUE"; 
+            efeito = "+10 ATK";
+            corAmuleto = RED; 
+        }
+        else if (i == AMULETO_DEFESA) { 
+            nomeAmuleto = "DEFESA"; 
+            efeito = "+5 DEF";
+            corAmuleto = BLUE; 
+        }
+        else if (i == AMULETO_VIDA) { 
+            nomeAmuleto = "VIDA"; 
+            efeito = "+20 HP";
+            corAmuleto = GREEN; 
+        }
+
+        if (personagem.dados.amuletos[i].coletado) {
+            // Amuleto coletado - aparência brilhante
+            DrawRectangleRec(slot, Fade(corAmuleto, 0.4f));
+            DrawRectangleLinesEx(slot, 3, corAmuleto);
+            DrawText(nomeAmuleto, (int)(slot.x + 25), (int)(slot.y + 35), 20, WHITE);
+            DrawText(efeito, (int)(slot.x + 20), (int)(slot.y + 65), 14, YELLOW);
+            DrawText("[OK]", (int)(slot.x + 35), (int)(slot.y + 105), 14, GREEN);
+        } else {
+            // Amuleto não coletado - aparência apagada
+            DrawRectangleRec(slot, Fade(BLACK, 0.7f));
+            DrawRectangleLinesEx(slot, 2, GRAY);
+            DrawText("?", (int)(slot.x + 60), (int)(slot.y + 50), 40, GRAY);
+            DrawText("[---]", (int)(slot.x + 30), (int)(slot.y + 105), 14, DARKGRAY);
+        }
+    }
+
+    DrawText("Pressione ESC para voltar", invX + 30, invY + invAltura - 40, 16, LIGHTGRAY);
+
+    // Fechar inventário ao pressionar ESC
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        estadoAtual = ESTADO_PAUSADO;
+    }
+}
+
 void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabilitado) {
     float x = tela.largura / 2.0f - menuPause.botaoW / 2.0f;
     float y = menuPause.botoesY[posIndex] - menuPause.botaoH / 2.0f;
@@ -198,6 +273,9 @@ void desenhaMenu() {
         updatePause();
     else if (estadoAtual == ESTADO_CONFIGURACOES)
         updateConfiguracoes();
+    else if (estadoAtual == ESTADO_INVENTARIO) {
+    desenhaInventario();
+    }    
 
     // DRAW
     BeginDrawing();

@@ -133,14 +133,14 @@ void updateJogo() {
     for (int i = 0; i < quantidadeInimigos; i++) {
         if (listaInimigos[i].dados.vivo) {
             Rectangle rectInimigo = { listaInimigos[i].posicao.x, listaInimigos[i].posicao.y, (float)listaInimigos[i].largura, (float)listaInimigos[i].altura };
-
+            //se ta atacando e colidiu com o inimigo, causa dano
             if (personagem.dados.ataque && CheckCollisionRecs(rectAtaque, rectInimigo)) {
-                listaInimigos[i].dados.hp -= 50;
+                listaInimigos[i].dados.hp -= personagem.dados.valorAtaque;
                 personagem.dados.ataque = false; 
 
                 if (listaInimigos[i].dados.hp <= 0) {
                     listaInimigos[i].dados.hp = 0;
-                    listaInimigos[i].dados.vivo = false; 
+                    listaInimigos[i].dados.vivo = false; // Marca o inimigo como morto
                 }
                 
                 float direcaoInimigoEmpurrado = (personagem.posicao.x < listaInimigos[i].posicao.x) ? 1.0f : -1.0f;
@@ -150,7 +150,7 @@ void updateJogo() {
             }
 
             if (!personagem.dados.ataque && CheckCollisionRecs(rectPlayer, rectInimigo)) {
-                personagem.dados.hp -= 10; 
+                personagem.dados.hp -= (20 - personagem.dados.valorDefesa); // Dano base 20 menos defesa do personagem
                 if (personagem.dados.hp <= 0) {
                     personagem.dados.hp = 0;
                     personagem.dados.vivo = false; 
@@ -161,6 +161,26 @@ void updateJogo() {
                 constantesJogo.velocidadeY = -6.0f; 
 
                 break; 
+            }
+        }
+    }
+    if (personagem.dados.habilidadeAtiva.ativo) {
+        Rectangle rectHab = { personagem.dados.habilidadeAtiva.posicao.x, personagem.dados.habilidadeAtiva.posicao.y, 7, 7 };
+    
+        for (int i = 0; i < quantidadeInimigos; i++) {
+            if (listaInimigos[i].dados.vivo) {
+                Rectangle rectInimigo = { listaInimigos[i].posicao.x, listaInimigos[i].posicao.y, (float)listaInimigos[i].largura, (float)listaInimigos[i].altura };
+                
+                if (CheckCollisionRecs(rectHab, rectInimigo)) {
+                    listaInimigos[i].dados.hp -= 50;
+                    personagem.dados.habilidadeAtiva.ativo = false;
+                    
+                    if (listaInimigos[i].dados.hp <= 0) {
+                        listaInimigos[i].dados.hp = 0;
+                        listaInimigos[i].dados.vivo = false;
+                    }
+                    break;
+                }
             }
         }
     }
@@ -198,6 +218,14 @@ void drawFundo() {
         }
     }
 }
+void desenhaHabilidade() {
+    if (personagem.dados.habilidadeAtiva.ativo) {
+        int tamHab = personagem.largura / 3;
+        DrawRectangle((int)personagem.dados.habilidadeAtiva.posicao.x, 
+                     (int)personagem.dados.habilidadeAtiva.posicao.y, 
+                     tamHab, tamHab, ORANGE);
+    }
+}
 
 void drawJogo() {
     ClearBackground(PURPLE);
@@ -205,6 +233,7 @@ void drawJogo() {
     BeginMode2D(tela.camera);
         desenhaMapa();
         desenhaPersonagem();
+        desenhaHabilidade();
         desenhaInimigo(); 
         desenhaBoss(); 
     EndMode2D();

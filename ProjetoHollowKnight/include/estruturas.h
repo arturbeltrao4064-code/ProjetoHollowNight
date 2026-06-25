@@ -53,6 +53,13 @@ typedef struct {
 } infoMenu;
 
 typedef struct {
+    bool ativo;
+    Vector2 posicao;
+    float velocidade;
+    bool direcao; // true = direita, false = esquerda
+} Habilidade;
+
+typedef struct {
     int hp;
     int mp;
     int valorAtaque;
@@ -61,6 +68,8 @@ typedef struct {
     bool vivo;
     int amuletosColetados;
     Amuleto amuletos[TOTAL_AMULETOS];
+    int habilidadesColetadas;  // ← ADICIONA
+    Habilidade habilidadeAtiva; // ← ADICIONA
 } dadosEntidade;
 
 typedef struct {

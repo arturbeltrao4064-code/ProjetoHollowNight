@@ -61,6 +61,43 @@ void verificaColisaoAmuletos() {
         }
     }
 }
+void coletaHabilidade() {
+    if (personagem.dados.habilidadesColetadas < 3) {
+        personagem.dados.habilidadesColetadas++;
+    }
+}
+
+void verificaColisaoHabilidades() {
+    float x = personagem.posicao.x;
+    float y = personagem.posicao.y;
+    float w = (float)personagem.largura;
+    float h = (float)personagem.altura;
+    
+    int col = (int)((x + w / 2) / bloco.largura);
+    int lin = (int)((y + h / 2) / bloco.altura);
+    
+    if (lin >= 0 && lin < map.linhas && col >= 0 && col < map.colunas) {
+        char c = map.matrizMapa[lin][col];
+        
+        if (c == 'H') {
+            coletaHabilidade();
+            map.matrizMapa[lin][col] = ' ';
+        }
+    }
+}
+
+void disparaHabilidade() {
+    if (IsKeyPressed(KEY_Z) && personagem.dados.habilidadesColetadas > 0 && personagem.dados.mp >= 20) {
+        personagem.dados.mp -= 20;
+        personagem.dados.habilidadesColetadas--;
+        
+        personagem.dados.habilidadeAtiva.ativo = true;
+        personagem.dados.habilidadeAtiva.posicao = personagem.posicao;
+        personagem.dados.habilidadeAtiva.velocidade = 8.0f;
+        personagem.dados.habilidadeAtiva.direcao = personagem.olhandoDireita;
+    }
+}
+
 
 
 // Variável local para controlar quanto tempo o boneco fica rosa atacando
@@ -87,6 +124,20 @@ void updatePersonagem() {
 
     personagem.posicao = movimentaPersonagem(personagem.posicao);
     verificaColisaoAmuletos();
+    verificaColisaoAmuletos();
+    verificaColisaoHabilidades();
+    disparaHabilidade();
+    
+    // Atualiza habilidade ativa
+    if (personagem.dados.habilidadeAtiva.ativo) {
+        float dx = personagem.dados.habilidadeAtiva.direcao ? personagem.dados.habilidadeAtiva.velocidade : -personagem.dados.habilidadeAtiva.velocidade;
+        personagem.dados.habilidadeAtiva.posicao.x += dx;
+        
+        // Remove se sair do mapa
+        if (personagem.dados.habilidadeAtiva.posicao.x < 0 || personagem.dados.habilidadeAtiva.posicao.x > map.colunas * bloco.largura) {
+            personagem.dados.habilidadeAtiva.ativo = false;
+        }
+    }
 }
 
 void desenhaPersonagem() {

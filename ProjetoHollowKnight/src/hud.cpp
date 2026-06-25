@@ -3,11 +3,6 @@
 #include <raylib.h>
 #include <stdio.h>
 
-void initHud() {
-    // Como a vida agora é controlada na inicialização do personagem,
-    // não precisamos setar variáveis locais aqui.
-}
-
 void desenhaHud(int hp, int mp, int ataque, int defesa) {
     int barLargura = 200;
     int barAltura  = 18;
@@ -29,11 +24,20 @@ void desenhaHud(int hp, int mp, int ataque, int defesa) {
 
     // --- ATAQUE E DEFESA ---
     int yInferior = tela.altura - 60;
-    
-    char atkText[20], defText[20];
-    sprintf(atkText, "ATK: %d", ataque);
-    sprintf(defText, "DEF: %d", defesa);
-    
-    DrawText(atkText, x, yInferior, 18, WHITE);
-    DrawText(defText, x, yInferior + 25, 18, WHITE);
+    DrawText(TextFormat("ATK: %d", ataque), x, yInferior, 18, WHITE);
+    DrawText(TextFormat("DEF: %d", defesa), x, yInferior + 25, 18, WHITE);
+
+    // --- HABILIDADES ---
+    int yHab = yInferior + 60;
+    DrawText("HABILIDADES:", x, yHab, 14, YELLOW);
+    for (int i = 0; i < 3; i++) {
+        Rectangle slot = { (float)(x + (i * 30)), (float)(yHab + 20), 25, 25 };
+        if (i < personagem.dados.habilidadesColetadas) {
+            DrawRectangleRec(slot, ORANGE);
+            DrawRectangleLinesEx(slot, 1, YELLOW);
+        } else {
+            DrawRectangleRec(slot, DARKGRAY);
+            DrawRectangleLinesEx(slot, 1, GRAY);
+        }
+    }
 }
