@@ -50,8 +50,8 @@ void inicializaPosicoesEntidades() {
             else if (c == 'C') {
                 chefao.posicao = (Vector2){ posX, posY };
                 chefao.posicaoInicial = (Vector2){ posX, posY };
-                chefao.largura = 60;
-                chefao.altura = 60;
+                chefao.largura = 30;
+                chefao.altura = 30;
                 chefao.dados.hp = 500;
                 chefao.dados.vivo = true;
                 bossAtivo = true;
@@ -66,13 +66,16 @@ void inicializaPosicoesEntidades() {
 void loadJogo() {
     switch (faseDoJogo) {
         case FASE_VILA:
-            map.localMapa = "maps/mapaVila.txt";
+            map.localMapa = "maps/vila.txt";
             break;
         case FASE_INICIAL:
-            map.localMapa = "maps/mapaInicial.txt";
+            map.localMapa = "maps/tunel1.txt";
             break;
         case FASE_FINAL:
-            map.localMapa = "maps/mapaFinal.txt";
+            map.localMapa = "maps/tunel2.txt";
+            break;
+        case FASE_TUNEL3:
+            map.localMapa = "maps/tunel3.txt";
             break;
     }
 

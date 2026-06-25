@@ -4,6 +4,7 @@
 #include "inimigo.h"
 #include "boss.h"
 #include "hud.h"
+#include "menu.h"
 #include <raylib.h>
 #include <string.h>
 #include <stdio.h>
@@ -30,37 +31,62 @@ static void empurraInimigoParaTras(infoEntidade* inimigo, float direcao) {
         inimigo->posicao.x = novoX;
     }
 
-    // Recuo vertical mais forte para enfatizar o impacto.
     inimigo->posicao.y -= 10.0f;
+}
+
+static void trocarMapa(const char* novoMapa) {
+    map.localMapa = novoMapa;
+    TraceLog(LOG_INFO, ">>> TROCA DE FASE! Carregando novo mapa: %s", map.localMapa);
+
+    unloadMapa();
+    quantidadeInimigos = 0;
+    bossAtivo = false;
+    chefao.dados.vivo = false;
+    flaskCarga = 100.0f;
+
+    loadMapa();
+    inicializaPosicoesEntidades();
 }
 
 static void gerenciarTransicaoFases() {
     float mapaLargura = map.colunas * bloco.largura;
-    bool mudouDeFase = false;
+    bool chegouDireita = (personagem.posicao.x + personagem.largura) >= (mapaLargura - 45.0f);
+    bool chegouEsquerda = personagem.posicao.x <= 5.0f;
 
-    if ((personagem.posicao.x + personagem.largura) >= (mapaLargura - 45.0f)) {
-        if (faseDoJogo == FASE_VILA) {
+    if (faseDoJogo == FASE_VILA && chegouDireita) {
+        if (proximoTunel == 1) {
             faseDoJogo = FASE_INICIAL;
-            map.localMapa = "maps/mapaInicial.txt";
-            mudouDeFase = true;
-        }
-        else if (faseDoJogo == FASE_INICIAL) {
+            trocarMapa("maps/tunel1.txt");
+        } else if (proximoTunel == 2) {
             faseDoJogo = FASE_FINAL;
-            map.localMapa = "maps/mapaFinal.txt";
-            mudouDeFase = true;
+            trocarMapa("maps/tunel2.txt");
+        } else if (proximoTunel == 3) {
+            faseDoJogo = FASE_TUNEL3;
+            trocarMapa("maps/tunel3.txt");
         }
+        return;
     }
 
-    if (mudouDeFase) {
-        TraceLog(LOG_INFO, ">>> TROCA DE FASE! Carregando novo mapa: %s", map.localMapa);
-        unloadMapa();
-        quantidadeInimigos = 0;
-        bossAtivo = false;
-        chefao.dados.vivo = false;
-        flaskCarga = 100.0f;
+    if (faseDoJogo == FASE_INICIAL && chegouEsquerda) {
+        if (proximoTunel < 2) proximoTunel = 2;
+        faseDoJogo = FASE_VILA;
+        trocarMapa("maps/vila.txt");
+        return;
+    }
 
-        loadMapa();
-        inicializaPosicoesEntidades();
+    if (faseDoJogo == FASE_FINAL && chegouEsquerda) {
+        if (proximoTunel < 3) proximoTunel = 3;
+        faseDoJogo = FASE_VILA;
+        trocarMapa("maps/vila.txt");
+        return;
+    }
+
+    if (faseDoJogo == FASE_TUNEL3 && chegouEsquerda) {
+        proximoTunel = 4;
+        faseDoJogo = FASE_VILA;
+        trocarMapa("maps/vila.txt");
+        estadoAtual = ESTADO_FIM;
+        return;
     }
 }
 
@@ -102,7 +128,6 @@ void updateJogo() {
 
             float direcaoInimigoEmpurrado = personagem.olhandoDireita ? 1.0f : -1.0f;
             empurraInimigoParaTras(&listaInimigos[i], direcaoInimigoEmpurrado);
-            // Inimigo simples morto: recupera 25% do flask
             if (!listaInimigos[i].dados.vivo) {
                 flaskCarga += 25.0f;
                 if (flaskCarga > 100.0f) flaskCarga = 100.0f;

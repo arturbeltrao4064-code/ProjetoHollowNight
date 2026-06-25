@@ -11,6 +11,12 @@
 Estado estadoAtual = ESTADO_MENU;
 static int opcaoMorteSelecionada = 0;
 
+static void updateFim() {
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+        estadoAtual = ESTADO_MENU;
+    }
+}
+
 static void iniciarNovoJogo() {
     personagem.dados.hp = 5;
     personagem.dados.hpMax = 5;
@@ -26,8 +32,9 @@ static void iniciarNovoJogo() {
     personagem.dados.vivo = true;
     personagem.dados.habilidadeAtiva.ativo = false;
     faseDoJogo = FASE_VILA;
+    proximoTunel = 1;
     unloadMapa();
-    map.localMapa = "maps/mapaVila.txt";
+    map.localMapa = "maps/vila.txt";
     loadMapa();
     inicializaPosicoesEntidades();
     estadoAtual = ESTADO_JOGANDO;
@@ -75,6 +82,9 @@ void desenhaMenu() {
     }
     else if (estadoAtual == ESTADO_MORTE) {
         updateMorte();
+    }
+    else if (estadoAtual == ESTADO_FIM) {
+        updateFim();
     }
 
     // DRAW
@@ -160,6 +170,23 @@ void desenhaMenu() {
         DrawText(hint,
             tela.largura / 2 - MeasureText(hint, 16) / 2,
             tela.altura - 40, 16, LIGHTGRAY);
+    }
+    else if (estadoAtual == ESTADO_FIM) {
+        DrawRectangle(0, 0, tela.largura, tela.altura, (Color){10, 10, 10, 255});
+
+        const char* titulo = "FIM DE JOGO";
+        const char* subtitulo = "Voce concluiu todos os tuneis!";
+        const char* info = "Pressione ENTER ou ESC para voltar ao menu";
+
+        DrawText(titulo,
+            tela.largura / 2 - MeasureText(titulo, 62) / 2,
+            220, 62, GOLD);
+        DrawText(subtitulo,
+            tela.largura / 2 - MeasureText(subtitulo, 30) / 2,
+            320, 30, RAYWHITE);
+        DrawText(info,
+            tela.largura / 2 - MeasureText(info, 22) / 2,
+            410, 22, LIGHTGRAY);
     }
 
     EndDrawing();

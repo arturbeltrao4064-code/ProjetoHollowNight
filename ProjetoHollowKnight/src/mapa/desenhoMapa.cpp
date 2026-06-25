@@ -1,6 +1,33 @@
 #include "mapa.h"
 #include <raylib.h>
 
+static int proximoAmuletoNaoColetado() {
+    for (int i = 0; i < TOTAL_AMULETOS; i++) {
+        if (!personagem.dados.amuletos[i].coletado) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static void desenhaAmuletoPorTipo(float posX, float posY, int tipo) {
+    if (tipo == AMULETO_ATAQUE) {
+        DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, YELLOW);
+        DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, ORANGE);
+        DrawText("1", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+    }
+    else if (tipo == AMULETO_DEFESA) {
+        DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, ORANGE);
+        DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, (Color){200, 100, 0, 255});
+        DrawText("2", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+    }
+    else if (tipo == AMULETO_VIDA) {
+        DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, GREEN);
+        DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, DARKGREEN);
+        DrawText("3", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+    }
+}
+
 void desenhaMapa() {
     if (map.matrizMapa == nullptr) return;
 
@@ -12,26 +39,25 @@ void desenhaMapa() {
             float posX = j * bloco.largura;
             float posY = i * bloco.altura;
 
-            if      (c == 'P') DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, BLACK);
+            if (c == 'P') {
+                bool paredeSaida = (faseDoJogo != FASE_VILA) && (j <= 1);
+                DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura,
+                              paredeSaida ? (Color){180, 40, 40, 255} : BLACK);
+            }
             else if (c == 'C') DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, PURPLE);
             else if (c == 'H') DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, BLUE);
             else if (c == 'A') {
-                // Amuleto de Ataque (1) - amarelo
-                DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, YELLOW);
-                DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, ORANGE);
-                DrawText("1", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+                // Marcador generico: mostra o proximo amuleto ainda nao coletado.
+                int tipo = proximoAmuletoNaoColetado();
+                if (tipo >= 0) {
+                    desenhaAmuletoPorTipo(posX, posY, tipo);
+                }
             }
             else if (c == 'E') {
-                // Amuleto de Velocidade (2) - laranja
-                DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, ORANGE);
-                DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, (Color){200, 100, 0, 255});
-                DrawText("2", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+                desenhaAmuletoPorTipo(posX, posY, AMULETO_DEFESA);
             }
             else if (c == 'L') {
-                // Amuleto de Vida (3) - verde
-                DrawRectangle((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, GREEN);
-                DrawRectangleLines((int)posX, (int)posY, (int)bloco.largura, (int)bloco.altura, DARKGREEN);
-                DrawText("3", (int)posX + (int)bloco.largura/2 - 4, (int)posY + (int)bloco.altura/2 - 7, 14, BLACK);
+                desenhaAmuletoPorTipo(posX, posY, AMULETO_VIDA);
             }
         }
     }

@@ -1,6 +1,15 @@
 #include "personagem.h"
 #include "mapa.h"
 
+static int proximoAmuletoNaoColetado() {
+    for (int i = 0; i < TOTAL_AMULETOS; i++) {
+        if (!personagem.dados.amuletos[i].coletado) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void inicializaAmuletos() {
     for (int i = 0; i < TOTAL_AMULETOS; i++) {
         personagem.dados.amuletos[i].coletado = false;
@@ -73,8 +82,12 @@ void verificaColisaoAmuletos() {
     if (lin >= 0 && lin < map.linhas && col >= 0 && col < map.colunas) {
         char c = map.matrizMapa[lin][col];
         if (c == 'A') {
-            coletaAmuleto(AMULETO_ATAQUE);
-            map.matrizMapa[lin][col] = ' ';
+            // 'A' funciona como marcador generico: concede sempre o proximo amuleto faltante.
+            int tipo = proximoAmuletoNaoColetado();
+            if (tipo >= 0) {
+                coletaAmuleto((TipoAmuleto)tipo);
+                map.matrizMapa[lin][col] = ' ';
+            }
         } else if (c == 'E') {
             coletaAmuleto(AMULETO_DEFESA);
             map.matrizMapa[lin][col] = ' ';

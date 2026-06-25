@@ -29,8 +29,9 @@ void updateMenuPrincipal() {
                 personagem.dados.vivo = true;
                 personagem.dados.habilidadeAtiva.ativo = false;
                 faseDoJogo = FASE_VILA;
+                proximoTunel = 1;
                 unloadMapa();
-                map.localMapa = "maps/mapaVila.txt";
+                map.localMapa = "maps/vila.txt";
                 loadMapa();
                 inicializaPosicoesEntidades();
                 estadoAtual = ESTADO_JOGANDO;
@@ -39,9 +40,10 @@ void updateMenuPrincipal() {
                 carregaJogo();
                 unloadMapa();
                 switch (faseDoJogo) {
-                    case FASE_VILA: map.localMapa = "maps/mapaVila.txt"; break;
-                    case FASE_INICIAL: map.localMapa = "maps/mapaInicial.txt"; break;
-                    case FASE_FINAL: map.localMapa = "maps/mapaFinal.txt"; break;
+                    case FASE_VILA: map.localMapa = "maps/vila.txt"; break;
+                    case FASE_INICIAL: map.localMapa = "maps/tunel1.txt"; break;
+                    case FASE_FINAL: map.localMapa = "maps/tunel2.txt"; break;
+                    case FASE_TUNEL3: map.localMapa = "maps/tunel3.txt"; break;
                 }
                 loadMapa();
                 inicializaPosicoesEntidades();

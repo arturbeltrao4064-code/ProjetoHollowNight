@@ -23,12 +23,13 @@ infoEntidade personagem = {
 // MODIFICADO: Inicializa o array de inimigos zerado. O mapa vai preencher cada um.
 infoEntidade listaInimigos[MAX_INIMIGOS] = { 0 };
 int quantidadeInimigos = 0;
+int proximoTunel = 1;
 
 // Substitua a inicialização antiga por essa:
 infoMapa map = { 
     16,           // Linhas (ajustado para bater com a matriz dos txts)
     151,          // Colunas
-    "maps/mapaVila.txt", 
+    "maps/vila.txt",
     nullptr
 };
 

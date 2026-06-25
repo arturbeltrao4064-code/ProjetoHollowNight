@@ -5,7 +5,7 @@
 #define MAX_INIMIGOS 10 // Limite máximo de inimigos que o mapa pode ter
 #define PERSONAGEM_MAX_HITS 4
 
-enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES, ESTADO_INVENTARIO, ESTADO_MORTE };
+enum Estado { ESTADO_MENU, ESTADO_JOGANDO, ESTADO_PAUSADO, ESTADO_CONFIGURACOES, ESTADO_INVENTARIO, ESTADO_MORTE, ESTADO_FIM };
 
 typedef enum {
     AMULETO_ATAQUE,
@@ -22,7 +22,8 @@ typedef struct {
 typedef enum {
     FASE_VILA = 0,
     FASE_INICIAL,
-    FASE_FINAL
+    FASE_FINAL,
+    FASE_TUNEL3
 } FaseAtual;
 
 // Certifique-se de que na sua struct infoMapa, o localMapa seja assim:
@@ -105,6 +106,7 @@ extern infoEntidade personagem;
 extern infoEntidade listaInimigos[MAX_INIMIGOS];
 extern int quantidadeInimigos;
 extern FaseAtual faseDoJogo;
+extern int proximoTunel;
 extern dadosEntidade dadosPersonagem;
 extern infoMapa map;
 extern infoBloco bloco;

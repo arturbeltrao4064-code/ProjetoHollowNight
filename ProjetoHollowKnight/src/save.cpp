@@ -20,6 +20,8 @@ void salvaJogo() {
         fprintf(arquivo, "%d\n", personagem.dados.amuletos[i].coletado ? 1 : 0);
     }
 
+    fprintf(arquivo, "%d\n", proximoTunel);
+
     fclose(arquivo);
 }
 
@@ -52,7 +54,7 @@ void carregaJogo() {
     }
 
     // Save novo: linha3=flask e linha4=fase. Save antigo: linha3=fase e linha4=habilidades.
-    if (linha3 >= 0 && linha3 <= 100 && linha4 >= 0 && linha4 <= 2) {
+    if (linha3 >= 0 && linha3 <= 100 && linha4 >= 0 && linha4 <= 3) {
         personagem.dados.flask = linha3;
         faseCarregada = linha4;
         fscanf(arquivo, "%d", &personagem.dados.habilidadesColetadas);
@@ -67,10 +69,32 @@ void carregaJogo() {
 
     faseDoJogo = (FaseAtual)faseCarregada;
     
+    personagem.dados.amuletosColetados = 0;
     for (int i = 0; i < TOTAL_AMULETOS; i++) {
         int coletado;
         fscanf(arquivo, "%d", &coletado);
         personagem.dados.amuletos[i].coletado = (coletado == 1);
+        if (personagem.dados.amuletos[i].coletado) {
+            personagem.dados.amuletosColetados++;
+        }
+    }
+
+    int tunelLido = 0;
+    if (fscanf(arquivo, "%d", &tunelLido) == 1 && tunelLido >= 1 && tunelLido <= 4) {
+        proximoTunel = tunelLido;
+    } else {
+        // Compatibilidade com saves antigos sem o campo de progresso.
+        switch (faseDoJogo) {
+            case FASE_INICIAL: proximoTunel = 1; break;
+            case FASE_FINAL: proximoTunel = 2; break;
+            case FASE_TUNEL3: proximoTunel = 3; break;
+            case FASE_VILA:
+            default:
+                proximoTunel = personagem.dados.amuletosColetados + 1;
+                if (proximoTunel < 1) proximoTunel = 1;
+                if (proximoTunel > 4) proximoTunel = 4;
+                break;
+        }
     }
 
     fclose(arquivo);
