@@ -61,5 +61,16 @@ Vector2 movimentaPersonagem(Vector2 posicaoAtual) {
     if (IsKeyPressed(KEY_UP) && noChao) {
         constantesJogo.velocidadeY = constantesJogo.forcaPulo;
     }
+
+    // Trava de limites do mapa para impedir sair da sala pelo teto/laterais.
+    if (y < 0.0f) {
+        y = 0.0f;
+        if (constantesJogo.velocidadeY < 0.0f) constantesJogo.velocidadeY = 0.0f;
+    }
+
+    if (x < 0.0f) x = 0.0f;
+    float limiteDireito = map.colunas * bloco.largura - w;
+    if (x > limiteDireito) x = limiteDireito;
+
     return (Vector2){ x, y };
 }

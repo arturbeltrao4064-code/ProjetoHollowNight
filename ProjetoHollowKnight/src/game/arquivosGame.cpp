@@ -92,8 +92,9 @@ void inicializaPosicoesEntidades() {
                 if (quantidadeInimigos < MAX_INIMIGOS) {
                     listaInimigos[quantidadeInimigos].posicao = (Vector2){ posX, posY };
                     listaInimigos[quantidadeInimigos].posicaoInicial = (Vector2){ posX, posY };
-                    listaInimigos[quantidadeInimigos].largura = 80;
-                    listaInimigos[quantidadeInimigos].altura = 80;
+                    // Hitbox menor para colisao estavel; sprite continua grande no desenho.
+                    listaInimigos[quantidadeInimigos].largura = 34;
+                    listaInimigos[quantidadeInimigos].altura = 40;
                     listaInimigos[quantidadeInimigos].olhandoDireita = true;
                     // Sistema por hits: cada inimigo aguenta 3 acertos.
                     listaInimigos[quantidadeInimigos].dados.hp = HP_INIMIGO_NORMAL;
@@ -105,10 +106,11 @@ void inicializaPosicoesEntidades() {
                 }
             }
             else if (c == 'C') {
-                bossState.entidade.posicao = (Vector2){ posX, posY };
-                bossState.entidade.posicaoInicial = (Vector2){ posX, posY };
-                bossState.entidade.largura = 100;
-                bossState.entidade.altura = 100;
+                float posYBoss = posY + 10.0f;
+                bossState.entidade.posicao = (Vector2){ posX, posYBoss };
+                bossState.entidade.posicaoInicial = (Vector2){ posX, posYBoss };
+                bossState.entidade.largura = 50;
+                bossState.entidade.altura = 50;
                 bossState.movendo = false;
                 bossState.preparando = false;
                 bossState.countdown = 3.0f;

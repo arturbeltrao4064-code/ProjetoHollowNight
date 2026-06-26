@@ -2,18 +2,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "Build Raylib",
             "type": "shell",
-            "command": "${workspaceFolder}/Makefile/compilador.bat",
+            "command": "/usr/bin/bash",
+            "args": [
+                "-c",
+                "g++ $(find src -name '*.cpp') -Iinclude -I/usr/local/include -L/usr/local/lib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -std=c++17 -o jogo"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true
-            }
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

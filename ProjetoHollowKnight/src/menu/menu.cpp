@@ -10,7 +10,7 @@
 
 Estado estadoAtual = ESTADO_MENU;
 static int opcaoMorteSelecionada = 0;
-static const bool MORTE_DESABILITADA_TESTE = true;
+static const bool MORTE_DESABILITADA_TESTE = false;
 
 static void updateFim() {
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -63,12 +63,12 @@ static void updateMorte() {
 
 static void desenhaTelaMenuPrincipal() {
     desenhaFundoMenu();
-    desenhaBotao(0, 0, menuPrincipal.opcaoSelecionada, false);
-    desenhaBotao(1, 1, menuPrincipal.opcaoSelecionada, false);
+    desenhaBotao(1, 0, menuPrincipal.opcaoSelecionada, false);
+    desenhaBotao(0, 1, menuPrincipal.opcaoSelecionada, false);
     desenhaBotao(2, 2, menuPrincipal.opcaoSelecionada, false);
     desenhaBotao(3, 3, menuPrincipal.opcaoSelecionada, false);
-    DrawText("SETAS = Navegar | ENTER = Selecionar",
-        tela.largura / 2 - MeasureText("SETAS = Navegar | ENTER = Selecionar", 16) / 2,
+    DrawText("J=Continuar  N=Novo Jogo  A=Ajuda  S=Sair",
+        tela.largura / 2 - MeasureText("J=Continuar  N=Novo Jogo  A=Ajuda  S=Sair", 16) / 2,
         tela.altura - 30, 16, DARKGRAY);
 }
 
@@ -81,9 +81,33 @@ static void desenhaTelaPausada() {
     desenhaBotaoPause(1, 1, menuPause.opcaoSelecionada, false);
     desenhaBotaoPause(2, 2, menuPause.opcaoSelecionada, false);
     desenhaBotaoPause(3, 3, menuPause.opcaoSelecionada, false);
-    desenhaBotaoPause(4, 4, menuPause.opcaoSelecionada, false);
-    const char* hint = "SETAS = Navegar | ENTER = Selecionar | ESC = Continuar";
+    const char* hint = "C=Continuar  I=Inventario  J=Salvar  S=Sair  ESC=Continuar";
     DrawText(hint, tela.largura / 2 - MeasureText(hint, 14) / 2, tela.altura - 30, 14, DARKGRAY);
+
+    if (confirmacaoSaidaPauseAtiva()) {
+        DrawRectangle(0, 0, tela.largura, tela.altura, (Color){0, 0, 0, 160});
+
+        Rectangle caixa = { (float)tela.largura / 2 - 220.0f, (float)tela.altura / 2 - 90.0f, 440.0f, 200.0f };
+        DrawRectangleRec(caixa, (Color){25, 25, 30, 240});
+        DrawRectangleLinesEx(caixa, 2, WHITE);
+
+        const char* pergunta = "Tem certeza que deseja sair?";
+        DrawText(pergunta,
+            (int)(caixa.x + caixa.width / 2 - MeasureText(pergunta, 28) / 2),
+            (int)(caixa.y + 28), 28, WHITE);
+
+        Rectangle botaoNao = { caixa.x + 80.0f, caixa.y + 120.0f, 120.0f, 44.0f };
+        Rectangle botaoSim = { caixa.x + 240.0f, caixa.y + 120.0f, 120.0f, 44.0f };
+        bool simSelecionado = (opcaoConfirmacaoSaidaPause() == 1);
+
+        DrawRectangleRec(botaoNao, simSelecionado ? GRAY : LIGHTGRAY);
+        DrawRectangleRec(botaoSim, simSelecionado ? LIGHTGRAY : GRAY);
+        DrawRectangleLinesEx(botaoNao, 2, WHITE);
+        DrawRectangleLinesEx(botaoSim, 2, WHITE);
+
+        DrawText("NAO", (int)(botaoNao.x + botaoNao.width / 2 - MeasureText("NAO", 22) / 2), (int)(botaoNao.y + 10), 22, BLACK);
+        DrawText("SIM", (int)(botaoSim.x + botaoSim.width / 2 - MeasureText("SIM", 22) / 2), (int)(botaoSim.y + 10), 22, BLACK);
+    }
 }
 
 static void desenhaTelaMorte() {

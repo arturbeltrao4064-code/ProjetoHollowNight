@@ -23,9 +23,8 @@ void loadMenu() {
     botaoContinuarPause = LoadTexture("assets/Menu/botoes/botaoContinuar.png");
     menuPause.menuBotoes[0] = botaoContinuarPause;
     menuPause.menuBotoes[1] = menuPrincipal.menuBotoes[5];
-    menuPause.menuBotoes[2] = menuPrincipal.menuBotoes[4];
-    menuPause.menuBotoes[3] = menuPrincipal.menuBotoes[6];
-    menuPause.menuBotoes[4] = menuPrincipal.menuBotoes[3];
+    menuPause.menuBotoes[2] = menuPrincipal.menuBotoes[6];
+    menuPause.menuBotoes[3] = menuPrincipal.menuBotoes[3];
 
     texturaAmuletos[0] = LoadTexture("assets/Objetos/amuleto1.png");
     texturaAmuletos[1] = LoadTexture("assets/Objetos/amuleto2.png");

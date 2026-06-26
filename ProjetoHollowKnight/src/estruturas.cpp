@@ -20,7 +20,7 @@ static void inicializaTela() {
     tela.largura = 1500;
     tela.altura = 800;
     snprintf(tela.titulo, sizeof(tela.titulo), "%s", "Hollow Knight");
-    tela.camera = (Camera2D){ {0, 0}, {0, 0}, 0.0f, 1.0f };
+    tela.camera = (Camera2D){ {0, 0}, {0, 0}, 0.0f, 3.0f };
 }
 
 static void inicializaPersonagemBase() {
@@ -63,21 +63,20 @@ static void inicializaMenus() {
     menuPrincipal.botaoH = 50;
 
     menuPause = (infoMenu){ 0 };
-    menuPause.totalOpcoes = 5;
+    menuPause.totalOpcoes = 4;
     menuPause.opcaoSelecionada = 0;
     menuPause.botoesY[0] = 220;
-    menuPause.botoesY[1] = 290;
-    menuPause.botoesY[2] = 360;
-    menuPause.botoesY[3] = 430;
-    menuPause.botoesY[4] = 495;
+    menuPause.botoesY[1] = 305;
+    menuPause.botoesY[2] = 390;
+    menuPause.botoesY[3] = 475;
     menuPause.botaoW = 260;
     menuPause.botaoH = 55;
 }
 
 static void inicializaConstantes() {
-    constantesJogo.velocidade = 8.0f;
+    constantesJogo.velocidade = 4.0f;
     constantesJogo.gravidade = 0.5f;
-    constantesJogo.forcaPulo = -20.0f;
+    constantesJogo.forcaPulo = -13.4f;
     constantesJogo.velocidadeY = 0.0f;
 }
 

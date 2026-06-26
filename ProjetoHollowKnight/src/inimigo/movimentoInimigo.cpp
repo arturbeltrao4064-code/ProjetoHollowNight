@@ -3,12 +3,17 @@
 #include <raylib.h>
 
 static int tempoMudancaDirecao[MAX_INIMIGOS] = { 0 };
+static int cooldownViradaParede[MAX_INIMIGOS] = { 0 };
 
 Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual) {
     float x = posicaoAtual.x;
     float y = posicaoAtual.y;
     float w = (float)listaInimigos[indice].largura;
     float h = (float)listaInimigos[indice].altura;
+
+    if (cooldownViradaParede[indice] > 0) {
+        cooldownViradaParede[indice]--;
+    }
 
     if (tempoMudancaDirecao[indice] <= 0) {
         int novaDirecao = GetRandomValue(0, 1);
@@ -33,7 +38,10 @@ Vector2 movimentaInimigo(int indice, Vector2 posicaoAtual) {
     float pontoY1 = y + h * 0.35f;
     float pontoY2 = y + h * 0.70f;
     if (blocoSolido(frenteX, pontoY1) || blocoSolido(frenteX, pontoY2)) {
-        listaInimigos[indice].olhandoDireita = !listaInimigos[indice].olhandoDireita;
+        if (cooldownViradaParede[indice] <= 0) {
+            listaInimigos[indice].olhandoDireita = !listaInimigos[indice].olhandoDireita;
+            cooldownViradaParede[indice] = 8;
+        }
         x -= direcaoX * velocidadeInimigo;
     }
 

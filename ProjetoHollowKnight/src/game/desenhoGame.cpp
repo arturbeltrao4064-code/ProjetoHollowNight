@@ -21,7 +21,7 @@ void drawFundo() {
 
 void desenhaHabilidade() {
     if (personagem.dados.habilidadeAtiva.ativo) {
-        int tamHab = personagem.largura * 5;
+        int tamHab = personagem.largura * 3;
         Texture2D texturaAtual = personagem.dados.habilidadeAtiva.direcao ? texturaHabilidade[0] : texturaHabilidade[1];
         if (texturaAtual.width > 0 && texturaAtual.height > 0) {
             Rectangle src = { 0.0f, 0.0f, (float)texturaAtual.width, (float)texturaAtual.height };

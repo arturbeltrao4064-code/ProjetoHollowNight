@@ -10,6 +10,8 @@ void unloadMenu();
 
 void updatePause();
 void updateMenuPrincipal();
+bool confirmacaoSaidaPauseAtiva();
+int opcaoConfirmacaoSaidaPause();
 
 void desenhaBotaoPause(int texIndex, int posIndex, int selecionado, bool desabilitado);
 void desenhaBotao(int texIndex, int posIndex, int selecionado, bool desabilitado);

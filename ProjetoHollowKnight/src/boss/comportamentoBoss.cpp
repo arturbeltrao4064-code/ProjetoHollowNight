@@ -31,23 +31,22 @@ static void resolveColisaoCorpoBossJogador() {
     float centroPlayerX = personagem.posicao.x + personagem.largura * 0.5f;
     float centroBossX = bossState.entidade.posicao.x + bossState.entidade.largura * 0.5f;
 
-    // Separa pelo menor eixo de intersecao para evitar "grudar" no boss.
-    if (inter.width < inter.height) {
-        float direcao = (centroPlayerX < centroBossX) ? -1.0f : 1.0f;
-        float novoX = personagem.posicao.x + direcao * (inter.width + 2.0f);
-        float checkX = (direcao > 0.0f) ? (novoX + personagem.largura) : novoX;
+    // Sempre separa na horizontal para impedir "surfar" no boss e evitar lancamento vertical infinito.
+    float direcao = (centroPlayerX < centroBossX) ? -1.0f : 1.0f;
+    float novoX = personagem.posicao.x + direcao * (inter.width + 3.0f);
+    float checkX = (direcao > 0.0f) ? (novoX + personagem.largura) : novoX;
 
-        bool colideParede = blocoSolido(checkX, personagem.posicao.y + 2.0f)
-                        || blocoSolido(checkX, personagem.posicao.y + personagem.altura - 2.0f);
-        if (!colideParede) {
-            personagem.posicao.x = novoX;
-        }
+    bool colideParede = blocoSolido(checkX, personagem.posicao.y + 2.0f)
+                    || blocoSolido(checkX, personagem.posicao.y + personagem.altura - 2.0f);
+    if (!colideParede) {
+        personagem.posicao.x = novoX;
     } else {
-        // Fallback vertical: coloca o jogador acima do boss quando sobreposicao vertical predomina.
-        personagem.posicao.y = bossState.entidade.posicao.y - personagem.altura - 0.1f;
-        if (constantesJogo.velocidadeY > 0.0f) {
-            constantesJogo.velocidadeY = 0.0f;
-        }
+        // Se nao der para empurrar na horizontal, desloca minimamente para cima sem acumular velocidade.
+        personagem.posicao.y -= (inter.height + 1.0f);
+    }
+
+    if (constantesJogo.velocidadeY < -8.0f) {
+        constantesJogo.velocidadeY = -8.0f;
     }
 }
 
@@ -92,7 +91,7 @@ static void tentarAplicarDanoBossNoJogador() {
         personagem.dados.vivo = false;
     }
 
-    aplicaKnockbackJogador(28.0f, 6.0f);
+    aplicaKnockbackJogador(28.0f, 3.0f);
     bossState.damageCooldown = bossState.damageInterval;
 }
 
@@ -126,7 +125,11 @@ void desenhaBoss() {
         Texture2D texturaAtual = bossState.entidade.olhandoDireita ? bossState.entidade.imagem[0] : bossState.entidade.imagem[1];
         if (texturaAtual.width > 0 && texturaAtual.height > 0) {
             Rectangle src = { 0.0f, 0.0f, (float)texturaAtual.width, (float)texturaAtual.height };
-            Rectangle dst = { bossState.entidade.posicao.x, bossState.entidade.posicao.y, (float)bossState.entidade.largura, (float)bossState.entidade.altura };
+            float spriteW = (float)bossState.entidade.largura;
+            float spriteH = (float)bossState.entidade.altura;
+            float drawX = bossState.entidade.posicao.x + ((float)bossState.entidade.largura - spriteW) * 0.5f;
+            float drawY = bossState.entidade.posicao.y + ((float)bossState.entidade.altura - spriteH) * 0.5f + 12.0f;
+            Rectangle dst = { drawX, drawY, spriteW, spriteH };
             Vector2 origin = { 0.0f, 0.0f };
             DrawTexturePro(texturaAtual, src, dst, origin, 0.0f, WHITE);
         } else {
