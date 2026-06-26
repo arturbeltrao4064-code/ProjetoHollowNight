@@ -1,0 +1,15 @@
+   P J P                                     PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP                  
+   P   P                                     P                                                                                     PPPP               
+   P   P                                     P                                       PPPPPPPPPPPPPPPPPP                                PPPP           
+PPPP   PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP      PPPPPPPPPPPPPPPP   PPPPPPPPPPPPPPP                PPPPPPPPPPPPPPPPPPPPPPPPPPPP     PPPPPPPPPPPPPPP
+P                                                                                                     P A                  P                         P
+P                                                H                     M                              P                    P                         P
+P                                              PPPPP             PPPPPPPPPPPPPPPPPPPPP                PPPP                 P                         P
+P                                                                         P                           P                    P                         P
+P                                                                         P                           P       PPPP         P                         P
+P                                                        PPPP             P                           P                    P                 C       P
+P                                                               PPP       P                 M         P                 M  P                         P
+PPPPPPPPPPPPPPPPPPPPPP                                                PPPPPPPPPP     PPPPPPPPPPPPPPPPPPPPPPPPPP       PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+                     P                                                P        P                                     P                                
+                     PP     M        M                                P        P      M        P             M      P                                 
+                     PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP        PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP                                  
